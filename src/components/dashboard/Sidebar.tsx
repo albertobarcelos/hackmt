@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -120,25 +120,23 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         <nav className="flex flex-col space-y-1">
           {menuItems.map((item) => (
             collapsed ? (
-              <TooltipProvider key={item.path} delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <NavLink
-                      to={item.path}
-                      className={cn(
-                        "sidebar-item justify-center",
-                        isActive(item.path) && "active"
-                      )}
-                    >
-                      {item.icon}
-                      <span className="sr-only">{item.name}</span>
-                    </NavLink>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-sidebar-primary text-sidebar-primary-foreground">
-                    {item.name}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip key={item.path}>
+                <TooltipTrigger asChild>
+                  <NavLink
+                    to={item.path}
+                    className={cn(
+                      "sidebar-item justify-center",
+                      isActive(item.path) && "active"
+                    )}
+                  >
+                    {item.icon}
+                    <span className="sr-only">{item.name}</span>
+                  </NavLink>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-sidebar-primary text-sidebar-primary-foreground">
+                  {item.name}
+                </TooltipContent>
+              </Tooltip>
             ) : (
               <NavLink
                 key={item.path}
@@ -158,23 +156,21 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
 
       <div className="border-t border-sidebar-border p-3">
         {collapsed ? (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full flex justify-center text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={20} />
-                  <span className="sr-only">Logout</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="bg-sidebar-primary text-sidebar-primary-foreground">
-                Logout
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full flex justify-center text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut size={20} />
+                <span className="sr-only">Logout</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-sidebar-primary text-sidebar-primary-foreground">
+              Logout
+            </TooltipContent>
+          </Tooltip>
         ) : (
           <Button
             variant="ghost"
