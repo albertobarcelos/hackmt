@@ -6,43 +6,57 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, Loader2, Mail, Lock, AlertTriangle, UserPlus } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, Lock, AlertTriangle, User, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-const LoginForm: React.FC = () => {
+const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            name
+          }
+        }
       });
 
       if (error) throw error;
 
-      setSuccess("Login successful!");
+      setSuccess("Registration successful! Please check your email for verification.");
       toast({
-        title: "Login successful",
-        description: "Welcome back to the admin panel!"
+        title: "Account created",
+        description: "Please check your email for verification.",
       });
+      
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 500);
+        navigate("/login");
+      }, 2000);
     } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Invalid email or password. Please try again.");
+      console.error("Registration error:", err);
+      setError(err.message || "Failed to register. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -51,9 +65,9 @@ const LoginForm: React.FC = () => {
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg animate-fade-in">
       <CardHeader className="space-y-1">
-        <CardTitle className="font-bold text-center text-teal-500 text-2xl">Login Administrador</CardTitle>
+        <CardTitle className="font-bold text-center text-teal-500 text-2xl">Create Account</CardTitle>
         <CardDescription className="text-center">
-          Enter your credentials to access the admin panel
+          Register to access the admin panel
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,7 +83,22 @@ const LoginForm: React.FC = () => {
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input 
+                id="name" 
+                placeholder="Your name" 
+                type="text" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                className="pl-10" 
+                required 
+              />
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -89,21 +118,30 @@ const LoginForm: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
                 id="password" 
                 placeholder="••••••••" 
                 type="password" 
-                autoComplete="current-password" 
                 value={password} 
                 onChange={e => setPassword(e.target.value)} 
+                className="pl-10" 
+                required 
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input 
+                id="confirmPassword" 
+                placeholder="••••••••" 
+                type="password" 
+                value={confirmPassword} 
+                onChange={e => setConfirmPassword(e.target.value)} 
                 className="pl-10" 
                 required 
               />
@@ -113,25 +151,25 @@ const LoginForm: React.FC = () => {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                Registering...
               </>
             ) : (
-              "Sign In"
+              "Register"
             )}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-muted-foreground text-center">
-          <span>Don't have an account? </span>
-          <Link to="/register" className="text-primary hover:underline font-medium">
-            Register now
+          <span>Already have an account? </span>
+          <Link to="/login" className="text-primary hover:underline font-medium">
+            Sign in
           </Link>
         </div>
         <Button variant="outline" className="w-full" asChild>
-          <Link to="/register">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Create Account
+          <Link to="/login">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Login
           </Link>
         </Button>
       </CardFooter>
@@ -139,4 +177,4 @@ const LoginForm: React.FC = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
