@@ -32,17 +32,17 @@ const LoginForm: React.FC = () => {
 
       if (error) throw error;
 
-      setSuccess("Login successful!");
+      setSuccess("Login bem-sucedido!");
       toast({
-        title: "Login successful",
-        description: "Welcome back to the admin panel!"
+        title: "Login bem-sucedido",
+        description: "Bem-vindo de volta ao painel de administração!"
       });
       setTimeout(() => {
         navigate("/dashboard");
       }, 500);
     } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Invalid email or password. Please try again.");
+      console.error("Erro de login:", err);
+      setError(err.message || "Email ou senha inválidos. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +53,7 @@ const LoginForm: React.FC = () => {
       <CardHeader className="space-y-1">
         <CardTitle className="font-bold text-center text-teal-500 text-2xl">Login Administrador</CardTitle>
         <CardDescription className="text-center">
-          Enter your credentials to access the admin panel
+          Entre com suas credenciais para acessar o painel de administração
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,7 +76,7 @@ const LoginForm: React.FC = () => {
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
                 id="email" 
-                placeholder="name@example.com" 
+                placeholder="nome@exemplo.com" 
                 type="email" 
                 autoCapitalize="none" 
                 autoComplete="email" 
@@ -90,9 +90,9 @@ const LoginForm: React.FC = () => {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                Forgot password?
+                Esqueceu a senha?
               </Link>
             </div>
             <div className="relative">
@@ -113,25 +113,25 @@ const LoginForm: React.FC = () => {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                Entrando...
               </>
             ) : (
-              "Sign In"
+              "Entrar"
             )}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-muted-foreground text-center">
-          <span>Don't have an account? </span>
+          <span>Não tem uma conta? </span>
           <Link to="/register" className="text-primary hover:underline font-medium">
-            Register now
+            Registre-se agora
           </Link>
         </div>
         <Button variant="outline" className="w-full" asChild>
           <Link to="/register">
             <UserPlus className="mr-2 h-4 w-4" />
-            Create Account
+            Criar Conta
           </Link>
         </Button>
       </CardFooter>

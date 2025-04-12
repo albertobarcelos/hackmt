@@ -27,7 +27,7 @@ const RegisterForm: React.FC = () => {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("As senhas não coincidem");
       setIsLoading(false);
       return;
     }
@@ -45,18 +45,18 @@ const RegisterForm: React.FC = () => {
 
       if (error) throw error;
 
-      setSuccess("Registration successful! Please check your email for verification.");
+      setSuccess("Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmação.");
       toast({
-        title: "Account created",
-        description: "Please check your email for verification.",
+        title: "Conta criada",
+        description: "Por favor, verifique seu e-mail para confirmação.",
       });
       
       setTimeout(() => {
         navigate("/login");
       }, 2000);
     } catch (err: any) {
-      console.error("Registration error:", err);
-      setError(err.message || "Failed to register. Please try again.");
+      console.error("Erro no cadastro:", err);
+      setError(err.message || "Falha ao cadastrar. Por favor, tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -65,9 +65,9 @@ const RegisterForm: React.FC = () => {
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg animate-fade-in">
       <CardHeader className="space-y-1">
-        <CardTitle className="font-bold text-center text-teal-500 text-2xl">Create Account</CardTitle>
+        <CardTitle className="font-bold text-center text-teal-500 text-2xl">Criar Conta</CardTitle>
         <CardDescription className="text-center">
-          Register to access the admin panel
+          Cadastre-se para acessar o painel de administração
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -85,12 +85,12 @@ const RegisterForm: React.FC = () => {
         )}
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">Nome</Label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
                 id="name" 
-                placeholder="Your name" 
+                placeholder="Seu nome" 
                 type="text" 
                 value={name} 
                 onChange={e => setName(e.target.value)} 
@@ -105,7 +105,7 @@ const RegisterForm: React.FC = () => {
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
                 id="email" 
-                placeholder="name@example.com" 
+                placeholder="nome@exemplo.com" 
                 type="email" 
                 autoCapitalize="none" 
                 autoComplete="email" 
@@ -118,7 +118,7 @@ const RegisterForm: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Senha</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -133,7 +133,7 @@ const RegisterForm: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -151,25 +151,25 @@ const RegisterForm: React.FC = () => {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Registering...
+                Cadastrando...
               </>
             ) : (
-              "Register"
+              "Cadastrar"
             )}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-sm text-muted-foreground text-center">
-          <span>Already have an account? </span>
+          <span>Já tem uma conta? </span>
           <Link to="/login" className="text-primary hover:underline font-medium">
-            Sign in
+            Entrar
           </Link>
         </div>
         <Button variant="outline" className="w-full" asChild>
           <Link to="/login">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Login
+            Voltar para Login
           </Link>
         </Button>
       </CardFooter>
