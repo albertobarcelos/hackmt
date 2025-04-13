@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { DetalhesVisitaData } from "@/components/visita/DetalhesVisita";
 import { supabase } from "@/integrations/supabase/client";
@@ -197,7 +196,7 @@ export const useVisitas = () => {
         coleta_amostras: data.coleta_amostras,
         amostras_enviadas: data.amostras_enviadas,
         observacoes_gerais: data.observacoes_gerais,
-        arquivos: data.arquivos || []
+        arquivos: data.arquivos as Array<{ url: string; tipo: 'foto' | 'video' }> || []
       };
 
       // Atualiza o estado local para refletir a nova visita
