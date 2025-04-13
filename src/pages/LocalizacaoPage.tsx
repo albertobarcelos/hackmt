@@ -2,12 +2,11 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Map } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
-import VisualizacaoToggle from "@/components/localizacao/VisualizacaoToggle";
+import { Search, Clock, ArrowRight } from "lucide-react";
+import { useVisitas } from "@/hooks/useVisitas";
 
 // Dados fictícios de bairros
 const bairros = [
@@ -52,6 +51,7 @@ const LocalizacaoPage: React.FC = () => {
   const [bairroSelecionado, setBairroSelecionado] = useState<string>("");
   const [casasFiltradas, setCasasFiltradas] = useState<Array<{ id: string; endereco: string; numero: string; referencia?: string }>>([]);
   const [termoBusca, setTermoBusca] = useState<string>("");
+  const { obterVisitasPorCasa } = useVisitas();
 
   // Ao selecionar um bairro, carregamos as casas correspondentes
   const handleBairroChange = (value: string) => {
@@ -91,6 +91,27 @@ const LocalizacaoPage: React.FC = () => {
     }
   };
 
+  // Navegação para histórico de visitas
+  const abrirHistoricoVisitas = (casaId: string) => {
+    const casa = casasFiltradas.find(c => c.id === casaId);
+    if (casa) {
+      const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
+      
+      navigate(`/visita/${casaId}`, { 
+        state: { 
+          endereco: enderecoCompleto,
+          exibirHistorico: true 
+        } 
+      });
+    }
+  };
+
+  // Verifica se existe histórico de visitas para uma casa
+  const temHistoricoVisitas = (casaId: string) => {
+    const visitas = obterVisitasPorCasa(casaId);
+    return visitas && visitas.length > 0;
+  };
+
   return (
     <div className="container mx-auto max-w-md p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Localização de Visitas</h1>
@@ -115,9 +136,6 @@ const LocalizacaoPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Botão para alternar para visualização de mapa */}
-      <VisualizacaoToggle />
 
       {/* Lista de Casas (aparece apenas quando um bairro é selecionado) */}
       {bairroSelecionado && (
@@ -149,12 +167,25 @@ const LocalizacaoPage: React.FC = () => {
                           <p className="text-sm text-gray-600">Ref: {casa.referencia}</p>
                         )}
                       </div>
-                      <Button 
-                        className="ml-2 bg-green-500 hover:bg-green-600"
-                        onClick={() => abrirFormularioCasa(casa.id)}
-                      >
-                        Visitar
-                      </Button>
+                      <div className="flex gap-2">
+                        {temHistoricoVisitas(casa.id) && (
+                          <Button 
+                            className="bg-blue-500 hover:bg-blue-600"
+                            onClick={() => abrirHistoricoVisitas(casa.id)}
+                            title="Ver histórico de visitas"
+                          >
+                            <Clock className="h-4 w-4" />
+                            <span className="sr-only md:not-sr-only md:ml-2">Histórico</span>
+                          </Button>
+                        )}
+                        <Button 
+                          className="bg-green-500 hover:bg-green-600"
+                          onClick={() => abrirFormularioCasa(casa.id)}
+                        >
+                          <ArrowRight className="h-4 w-4 mr-1" />
+                          Visitar
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

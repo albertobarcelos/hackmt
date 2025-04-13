@@ -8,7 +8,7 @@ import { useVisitas } from "@/hooks/useVisitas";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { X, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const VisitaPage: React.FC = () => {
   const { casaId } = useParams<{ casaId: string }>();
@@ -23,8 +23,13 @@ const VisitaPage: React.FC = () => {
   
   // Verificar se há dados da casa na location
   useEffect(() => {
-    if (location.state && location.state.endereco) {
-      setEndereco(location.state.endereco);
+    if (location.state) {
+      if (location.state.endereco) {
+        setEndereco(location.state.endereco);
+      }
+      if (location.state.exibirHistorico) {
+        setExibirHistorico(true);
+      }
     } else if (casaId) {
       // Aqui você poderia buscar os dados da casa usando o ID
       // Por enquanto estamos usando dados fictícios
