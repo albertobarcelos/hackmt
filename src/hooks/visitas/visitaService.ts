@@ -44,7 +44,7 @@ export const formatarVisitasDoDb = (visitasDb: any[]): DetalhesVisitaData[] => {
     coleta_amostras: visita.coleta_amostras,
     amostras_enviadas: visita.amostras_enviadas,
     observacoes_gerais: visita.observacoes_gerais,
-    arquivos: visita.arquivos || []
+    arquivos: Array.isArray(visita.arquivos) ? visita.arquivos : []
   }));
 };
 
