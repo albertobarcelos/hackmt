@@ -82,10 +82,10 @@ export const useVisitas = (): UseVisitasReturn => {
         coleta_amostras: novaVisitaDb.coleta_amostras,
         amostras_enviadas: novaVisitaDb.amostras_enviadas,
         observacoes_gerais: novaVisitaDb.observacoes_gerais,
-        // Aqui está o ajuste: verificar se arquivos existe e fornecer um valor padrão caso não exista
-        arquivos: Array.isArray(novaVisitaDb.arquivos) 
-          ? novaVisitaDb.arquivos 
-          : []
+        // Aqui está o ajuste: usando operador de acesso opcional para evitar erros de typescript
+        arquivos: (novaVisitaDb as any).arquivos ? 
+          Array.isArray((novaVisitaDb as any).arquivos) ? 
+            (novaVisitaDb as any).arquivos : [] : []
       };
       
       return novaVisita;

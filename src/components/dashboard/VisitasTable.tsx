@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { 
   Table, 
@@ -462,7 +463,7 @@ const VisitasTable: React.FC<VisitasTableProps> = ({ dateRange, bairro }) => {
       )}
 
       <Dialog open={!!selectedVisita} onOpenChange={() => selectedVisita && fecharDetalhes()}>
-        <DialogContent className="max-w-4xl bg-transparent border-none shadow-none">
+        <DialogContent className="max-w-4xl p-0 bg-transparent border-none shadow-none max-h-[85vh] overflow-hidden">
           {selectedVisita && (
             <DetalhesVisita 
               visita={selectedVisita} 

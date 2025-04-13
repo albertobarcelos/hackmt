@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { VisitaHistorico } from "@/components/visita/HistoricoVisitas";
 import HistoricoVisitasMobile from "@/components/visita/HistoricoVisitasMobile";
@@ -12,17 +11,14 @@ const HistoricoPage = () => {
   const { visitas, isLoading, obterDetalhesVisita, obterVisitasPorCasa } = useVisitas();
   const [visitaDetalhesId, setVisitaDetalhesId] = useState<string | null>(null);
   
-  // Verificamos se recebemos um casaId específico da navegação
   const locationState = location.state as { casaId?: string; endereco?: string } | null;
   const casaId = locationState?.casaId;
   const enderecoCasa = locationState?.endereco;
   
-  // Filtramos as visitas por casa se um casaId foi fornecido
   const visitasExibidas = casaId 
     ? obterVisitasPorCasa(casaId) || []
     : visitas;
 
-  // Formatar as visitas no formato esperado pelo componente HistoricoVisitas
   const visitasFormatadas: VisitaHistorico[] = visitasExibidas.map(visita => ({
     id: visita.id,
     casaId: visita.casaId,
@@ -71,9 +67,8 @@ const HistoricoPage = () => {
         </div>
       )}
       
-      {/* Modal de detalhes da visita */}
       <Dialog open={!!visitaDetalhesId} onOpenChange={fecharDetalhes}>
-        <DialogContent className="max-w-[360px] p-0">
+        <DialogContent className="max-w-[360px] p-0 max-h-[85vh] overflow-hidden">
           {detalhesVisita && (
             <DetalhesVisita 
               visita={detalhesVisita} 
