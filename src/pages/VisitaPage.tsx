@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const VisitaPage: React.FC = () => {
   const { casaId } = useParams<{ casaId: string }>();
@@ -17,6 +18,8 @@ const VisitaPage: React.FC = () => {
   const location = useLocation();
   const { toast } = useToast();
   const { adicionarVisita, obterVisitasPorCasa, obterDetalhesVisita, isLoading } = useVisitas();
+  const isMobile = useIsMobile();
+  const isAppAce = location.pathname.includes('/app-ace') || location.state?.fromAppAce;
   
   const [endereco, setEndereco] = useState<string>("");
   const [visitaSelecionadaId, setVisitaSelecionadaId] = useState<string | null>(null);
@@ -33,7 +36,6 @@ const VisitaPage: React.FC = () => {
       }
     } else if (casaId) {
       // Aqui você poderia buscar os dados da casa usando o ID
-      // Por enquanto estamos usando dados fictícios
       setEndereco("Endereço não especificado");
     }
   }, [location.state, casaId]);
@@ -70,7 +72,11 @@ const VisitaPage: React.FC = () => {
   
   // Função para voltar à página anterior
   const handleCancelar = () => {
-    navigate('/localizacao');
+    if (isAppAce) {
+      navigate('/app-ace/visitas');
+    } else {
+      navigate('/localizacao');
+    }
   };
   
   // Exibir detalhes de uma visita
@@ -91,7 +97,7 @@ const VisitaPage: React.FC = () => {
   // Renderizando o esqueleto de carregamento
   if (isLoading) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 pt-4 pb-16">
+      <div className={`container mx-auto ${isAppAce ? 'max-w-[375px]' : 'max-w-4xl'} px-4 pt-4 pb-16`}>
         <div className="mb-6 flex items-center">
           <Skeleton className="h-10 w-24" />
           <Skeleton className="ml-auto h-10 w-32" />
@@ -109,16 +115,16 @@ const VisitaPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-4 pb-16">
-      <div className="container mx-auto max-w-4xl px-4">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-4 pb-16 ${isAppAce ? 'pb-24' : ''}`}>
+      <div className={`container mx-auto ${isAppAce ? 'max-w-[375px]' : 'max-w-4xl'} px-4`}>
         <div className="mb-4 flex items-center">
           <Button 
-            className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 p-0"
             onClick={handleCancelar}
             variant="link"
           >
             <ArrowLeft className="h-4 w-4" />
-            Voltar
+            {isAppAce ? 'Voltar' : 'Voltar para Localização'}
           </Button>
           
           {visitasCasa.length > 0 && (
@@ -135,18 +141,33 @@ const VisitaPage: React.FC = () => {
         {exibirHistorico ? (
           <div className="space-y-6">
             <h1 className="text-2xl font-bold text-blue-900 mb-4">Histórico de Visitas</h1>
-            <HistoricoVisitas
-              visitas={visitasCasa.map(v => ({
-                id: v.id,
-                casaId: v.casaId,
-                endereco: v.endereco,
-                dataVisita: v.dataVisita,
-                tempoVisita: v.tempoVisita,
-                nome_agente: v.nome_agente,
-                situacao_imovel: v.situacao_imovel
-              }))}
-              onVerDetalhes={handleVerDetalhes}
-            />
+            {isAppAce ? (
+              <HistoricoVisitasMobile
+                visitas={visitasCasa.map(v => ({
+                  id: v.id,
+                  casaId: v.casaId,
+                  endereco: v.endereco,
+                  dataVisita: v.dataVisita,
+                  tempoVisita: v.tempoVisita,
+                  nome_agente: v.nome_agente,
+                  situacao_imovel: v.situacao_imovel
+                }))}
+                onVerDetalhes={handleVerDetalhes}
+              />
+            ) : (
+              <HistoricoVisitas
+                visitas={visitasCasa.map(v => ({
+                  id: v.id,
+                  casaId: v.casaId,
+                  endereco: v.endereco,
+                  dataVisita: v.dataVisita,
+                  tempoVisita: v.tempoVisita,
+                  nome_agente: v.nome_agente,
+                  situacao_imovel: v.situacao_imovel
+                }))}
+                onVerDetalhes={handleVerDetalhes}
+              />
+            )}
           </div>
         ) : (
           <FormularioVisita
@@ -154,13 +175,14 @@ const VisitaPage: React.FC = () => {
             endereco={endereco}
             onSalvar={handleSalvarVisita}
             onCancelar={handleCancelar}
+            isMobile={isAppAce}
           />
         )}
       </div>
       
-      {/* Dialog para exibir detalhes da visita - sem fundo */}
+      {/* Dialog para exibir detalhes da visita */}
       <Dialog open={!!detalhesVisita} onOpenChange={fecharDetalhes}>
-        <DialogContent className="max-w-3xl p-0 bg-transparent border-none shadow-none">
+        <DialogContent className={`${isAppAce ? 'max-w-[360px]' : 'max-w-3xl'} p-0 ${isAppAce ? '' : 'bg-transparent border-none shadow-none'}`}>
           {detalhesVisita && <DetalhesVisita visita={detalhesVisita} onFechar={fecharDetalhes} />}
         </DialogContent>
       </Dialog>
@@ -169,3 +191,4 @@ const VisitaPage: React.FC = () => {
 };
 
 export default VisitaPage;
+

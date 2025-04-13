@@ -77,7 +77,10 @@ const VisitasPage = () => {
       const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
       
       navigate(`/visita/${casaId}`, { 
-        state: { endereco: enderecoCompleto } 
+        state: { 
+          endereco: enderecoCompleto,
+          fromAppAce: true
+        } 
       });
     }
   };
@@ -148,3 +151,4 @@ const VisitasPage = () => {
 };
 
 export default VisitasPage;
+

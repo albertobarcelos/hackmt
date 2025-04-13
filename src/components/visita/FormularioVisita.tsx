@@ -44,9 +44,10 @@ interface FormularioVisitaProps {
   endereco: string;
   onSalvar: (dados: VisitaFormValues & { tempoVisita: number, dataVisita: Date, casaId: string }) => void;
   onCancelar: () => void;
+  isMobile?: boolean;
 }
 
-const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: FormularioVisitaProps) => {
+const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = false }: FormularioVisitaProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [tempoDecorrido, setTempoDecorrido] = React.useState(0);
@@ -92,22 +93,42 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: Formulario
       description: `Visita à ${endereco} registrada em ${Math.floor(tempoDecorrido / 60)} minutos e ${tempoDecorrido % 60} segundos.`
     });
     
-    navigate("/localizacao");
+    if (isMobile) {
+      navigate("/app-ace/visitas");
+    } else {
+      navigate("/localizacao");
+    }
   };
 
+  const containerClassNames = isMobile 
+    ? "container mx-auto max-w-[375px] p-0 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen"
+    : "container mx-auto max-w-3xl p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen";
+
+  const cardClassNames = isMobile
+    ? "shadow-md rounded-lg overflow-hidden"
+    : "shadow-lg";
+
+  const gridColumnClasses = isMobile
+    ? "grid grid-cols-1 gap-4"
+    : "grid grid-cols-1 md:grid-cols-2 gap-4";
+
+  const gridColumnClasses3 = isMobile 
+    ? "grid grid-cols-2 gap-4"
+    : "grid grid-cols-2 md:grid-cols-3 gap-4";
+
   return (
-    <div className="container mx-auto max-w-3xl p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-      <Card className="shadow-lg">
+    <div className={containerClassNames}>
+      <Card className={cardClassNames}>
         <CardHeader className="bg-blue-50">
           <CardTitle className="text-xl text-center text-blue-900">Registro de Visita</CardTitle>
-          <p className="text-sm text-center text-gray-600">{endereco}</p>
+          <p className="text-sm text-center text-gray-600 break-words">{endereco}</p>
           <Temporizador onTempoAtualizado={setTempoDecorrido} />
         </CardHeader>
         
-        <CardContent className="p-6">
+        <CardContent className="p-4 md:p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={gridColumnClasses}>
                 {/* Tipo de Imóvel */}
                 <FormField
                   control={form.control}
@@ -170,7 +191,7 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: Formulario
               <Separator className="my-4" />
               <h3 className="text-md font-medium mb-2">Depósitos Encontrados</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className={gridColumnClasses3}>
                 {/* Depósitos A1 */}
                 <FormField
                   control={form.control}
@@ -315,7 +336,7 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: Formulario
               <Separator className="my-4" />
               <h3 className="text-md font-medium mb-2">Tratamento</h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={gridColumnClasses}>
                 {/* Larvicida */}
                 <FormField
                   control={form.control}
@@ -412,7 +433,7 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: Formulario
               <Separator className="my-4" />
               <h3 className="text-md font-medium mb-2">Amostras e Coleta</h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={gridColumnClasses}>
                 {/* Coleta de amostras */}
                 <FormField
                   control={form.control}
@@ -483,7 +504,7 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar }: Formulario
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={gridColumnClasses}>
                   {/* Nome do agente */}
                   <FormField
                     control={form.control}
