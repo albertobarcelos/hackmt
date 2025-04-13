@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -13,8 +12,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Temporizador } from "./Temporizador";
 import { useToast } from "@/hooks/use-toast";
+import { Camera, X, FileVideo, Upload, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-// Schema de validação do formulário
 const visitaFormSchema = z.object({
   tipo_imovel: z.enum(["R", "C", "P", "T", "O"]),
   situacao_imovel: z.enum(["F", "R", "N", "P", "T"]),
@@ -42,7 +42,12 @@ type VisitaFormValues = z.infer<typeof visitaFormSchema>;
 interface FormularioVisitaProps {
   casaId: string;
   endereco: string;
-  onSalvar: (dados: VisitaFormValues & { tempoVisita: number, dataVisita: Date, casaId: string }) => void;
+  onSalvar: (dados: VisitaFormValues & { 
+    tempoVisita: number, 
+    dataVisita: Date, 
+    casaId: string,
+    arquivos?: { url: string, tipo: 'foto' | 'video' }[] 
+  }) => void;
   onCancelar: () => void;
   isMobile?: boolean;
 }
@@ -50,7 +55,14 @@ interface FormularioVisitaProps {
 const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = false }: FormularioVisitaProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [tempoDecorrido, setTempoDecorrido] = React.useState(0);
+  const [tempoDecorrido, setTempoDecorrido] = useState(0);
+  const [arquivos, setArquivos] = useState<Array<{ 
+    arquivo: File, 
+    previewUrl: string, 
+    tipo: 'foto' | 'video',
+    uploading: boolean 
+  }>>([]);
+  const [uploadingArquivos, setUploadingArquivos] = useState(false);
   
   const form = useForm<VisitaFormValues>({
     resolver: zodResolver(visitaFormSchema),
@@ -77,26 +89,115 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
     },
   });
 
-  const handleSubmit = (values: VisitaFormValues) => {
-    // Salvar os dados com o tempo decorrido e data atual
-    const dadosVisita = {
-      ...values,
-      tempoVisita: tempoDecorrido,
-      dataVisita: new Date(),
-      casaId,
-    };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    onSalvar(dadosVisita);
+    const file = files[0];
+    const fileType = file.type.startsWith('image/') ? 'foto' : 'video';
     
-    toast({
-      title: "Visita registrada com sucesso!",
-      description: `Visita à ${endereco} registrada em ${Math.floor(tempoDecorrido / 60)} minutos e ${tempoDecorrido % 60} segundos.`
-    });
+    const previewUrl = URL.createObjectURL(file);
     
-    if (isMobile) {
-      navigate("/app-ace/visitas");
-    } else {
-      navigate("/localizacao");
+    setArquivos([...arquivos, {
+      arquivo: file,
+      previewUrl,
+      tipo: fileType,
+      uploading: false
+    }]);
+
+    e.target.value = '';
+  };
+
+  const removerArquivo = (index: number) => {
+    const novaListaArquivos = [...arquivos];
+    URL.revokeObjectURL(novaListaArquivos[index].previewUrl);
+    novaListaArquivos.splice(index, 1);
+    setArquivos(novaListaArquivos);
+  };
+
+  const uploadArquivos = async () => {
+    if (arquivos.length === 0) return [];
+    
+    setUploadingArquivos(true);
+    const arquivosUpload = [...arquivos];
+    const arquivosUrls: Array<{ url: string, tipo: 'foto' | 'video' }> = [];
+    
+    try {
+      for (let i = 0; i < arquivosUpload.length; i++) {
+        const arquivo = arquivosUpload[i];
+        
+        arquivosUpload[i] = { ...arquivo, uploading: true };
+        setArquivos([...arquivosUpload]);
+        
+        const timestamp = new Date().getTime();
+        const fileName = `visita_${casaId}_${timestamp}_${i}${arquivo.tipo === 'foto' ? '.jpg' : '.mp4'}`;
+        
+        const { data, error } = await supabase.storage
+          .from('visitas')
+          .upload(`visitas/${casaId}/${fileName}`, arquivo.arquivo);
+          
+        if (error) {
+          throw new Error(`Erro ao fazer upload do arquivo ${i+1}: ${error.message}`);
+        }
+        
+        const { data: urlData } = supabase.storage
+          .from('visitas')
+          .getPublicUrl(`visitas/${casaId}/${fileName}`);
+          
+        arquivosUrls.push({
+          url: urlData.publicUrl,
+          tipo: arquivo.tipo
+        });
+        
+        arquivosUpload[i] = { ...arquivo, uploading: false };
+        setArquivos([...arquivosUpload]);
+      }
+      
+      return arquivosUrls;
+    } catch (error) {
+      console.error('Erro ao fazer upload dos arquivos:', error);
+      toast({
+        title: "Erro ao fazer upload",
+        description: error instanceof Error ? error.message : "Erro ao fazer upload dos arquivos",
+        variant: "destructive"
+      });
+      return [];
+    } finally {
+      setUploadingArquivos(false);
+    }
+  };
+
+  const handleSubmit = async (values: VisitaFormValues) => {
+    try {
+      const arquivosUrls = await uploadArquivos();
+      
+      const dadosVisita = {
+        ...values,
+        tempoVisita: tempoDecorrido,
+        dataVisita: new Date(),
+        casaId,
+        arquivos: arquivosUrls.length > 0 ? arquivosUrls : undefined
+      };
+
+      onSalvar(dadosVisita);
+      
+      toast({
+        title: "Visita registrada com sucesso!",
+        description: `Visita à ${endereco} registrada em ${Math.floor(tempoDecorrido / 60)} minutos e ${tempoDecorrido % 60} segundos.`
+      });
+      
+      if (isMobile) {
+        navigate("/app-ace/visitas");
+      } else {
+        navigate("/localizacao");
+      }
+    } catch (error) {
+      console.error('Erro ao salvar visita:', error);
+      toast({
+        title: "Erro ao salvar visita",
+        description: "Ocorreu um erro ao registrar a visita",
+        variant: "destructive"
+      });
     }
   };
 
@@ -129,7 +230,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               <div className={gridColumnClasses}>
-                {/* Tipo de Imóvel */}
                 <FormField
                   control={form.control}
                   name="tipo_imovel"
@@ -158,7 +258,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Situação do Imóvel */}
                 <FormField
                   control={form.control}
                   name="situacao_imovel"
@@ -192,7 +291,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
               <h3 className="text-md font-medium mb-2">Depósitos Encontrados</h3>
               
               <div className={gridColumnClasses3}>
-                {/* Depósitos A1 */}
                 <FormField
                   control={form.control}
                   name="depositos_A1"
@@ -212,7 +310,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos A2 */}
                 <FormField
                   control={form.control}
                   name="depositos_A2"
@@ -232,7 +329,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos B */}
                 <FormField
                   control={form.control}
                   name="depositos_B"
@@ -252,7 +348,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos C */}
                 <FormField
                   control={form.control}
                   name="depositos_C"
@@ -272,7 +367,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos D1 */}
                 <FormField
                   control={form.control}
                   name="depositos_D1"
@@ -292,7 +386,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos D2 */}
                 <FormField
                   control={form.control}
                   name="depositos_D2"
@@ -312,7 +405,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos E */}
                 <FormField
                   control={form.control}
                   name="depositos_E"
@@ -337,7 +429,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
               <h3 className="text-md font-medium mb-2">Tratamento</h3>
 
               <div className={gridColumnClasses}>
-                {/* Larvicida */}
                 <FormField
                   control={form.control}
                   name="larvicida_utilizado"
@@ -363,7 +454,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Adulticida */}
                 <FormField
                   control={form.control}
                   name="adulticida_utilizado"
@@ -389,7 +479,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Quantidade de larvicida */}
                 <FormField
                   control={form.control}
                   name="quantidade_larvicida"
@@ -409,7 +498,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Depósitos tratados */}
                 <FormField
                   control={form.control}
                   name="depositos_tratados"
@@ -434,7 +522,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
               <h3 className="text-md font-medium mb-2">Amostras e Coleta</h3>
 
               <div className={gridColumnClasses}>
-                {/* Coleta de amostras */}
                 <FormField
                   control={form.control}
                   name="coleta_amostras"
@@ -460,7 +547,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   )}
                 />
 
-                {/* Amostras enviadas */}
                 <FormField
                   control={form.control}
                   name="amostras_enviadas"
@@ -485,7 +571,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
               <h3 className="text-md font-medium mb-2">Responsáveis e Observações</h3>
 
               <div className="space-y-4">
-                {/* Pendência */}
                 <FormField
                   control={form.control}
                   name="pendencia"
@@ -505,7 +590,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                 />
 
                 <div className={gridColumnClasses}>
-                  {/* Nome do agente */}
                   <FormField
                     control={form.control}
                     name="nome_agente"
@@ -520,7 +604,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                     )}
                   />
 
-                  {/* Supervisor */}
                   <FormField
                     control={form.control}
                     name="supervisor"
@@ -536,7 +619,6 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                   />
                 </div>
 
-                {/* Observações gerais */}
                 <FormField
                   control={form.control}
                   name="observacoes_gerais"
@@ -556,15 +638,128 @@ const FormularioVisita = ({ casaId, endereco, onSalvar, onCancelar, isMobile = f
                 />
               </div>
 
+              <Separator className="my-4" />
+              <h3 className="text-md font-medium mb-2">Fotos e Vídeos</h3>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 border border-dashed border-gray-300 rounded-md p-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
+                      <div className="relative">
+                        <Input
+                          type="file"
+                          id="foto-upload"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                          aria-label="Adicionar foto"
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="flex items-center gap-1.5"
+                        >
+                          <Camera size={16} />
+                          <span>Foto</span>
+                        </Button>
+                      </div>
+                      
+                      <div className="relative">
+                        <Input
+                          type="file"
+                          id="video-upload"
+                          accept="video/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                          aria-label="Adicionar vídeo"
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="flex items-center gap-1.5"
+                        >
+                          <FileVideo size={16} />
+                          <span>Vídeo</span>
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {arquivos.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center mt-3">
+                        Adicione fotos ou vídeos relacionados à visita
+                      </p>
+                    )}
+                    
+                    {arquivos.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+                        {arquivos.map((arquivo, index) => (
+                          <div 
+                            key={index} 
+                            className="relative group border border-gray-200 rounded-md overflow-hidden bg-white"
+                          >
+                            {arquivo.tipo === 'foto' ? (
+                              <img 
+                                src={arquivo.previewUrl} 
+                                alt={`Foto ${index + 1}`} 
+                                className="w-full h-24 object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-24 bg-gray-900 flex items-center justify-center">
+                                <video 
+                                  src={arquivo.previewUrl} 
+                                  className="max-h-full max-w-full" 
+                                  controls
+                                />
+                              </div>
+                            )}
+                            
+                            <button
+                              type="button"
+                              onClick={() => removerArquivo(index)}
+                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-90 hover:opacity-100 transition-opacity"
+                              aria-label="Remover arquivo"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                            
+                            {arquivo.uploading && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-white"></div>
+                              </div>
+                            )}
+                            
+                            <span className="text-xs bg-gray-100 absolute bottom-0 left-0 right-0 py-0.5 px-2 truncate">
+                              {arquivo.tipo === 'foto' ? 'Foto' : 'Vídeo'} {index + 1}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-between pt-4">
                 <Button 
                   type="button" 
                   variant="outline"
                   onClick={onCancelar}
+                  disabled={uploadingArquivos}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">Salvar Visita</Button>
+                <Button 
+                  type="submit"
+                  disabled={uploadingArquivos}
+                  className="relative"
+                >
+                  {uploadingArquivos ? (
+                    <>
+                      <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></span>
+                      Enviando...
+                    </>
+                  ) : 'Salvar Visita'}
+                </Button>
               </div>
             </form>
           </Form>

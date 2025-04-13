@@ -27,6 +27,7 @@ export interface VisitaFormData {
   tempoVisita: number;
   dataVisita: Date;
   casaId: string;
+  arquivos?: Array<{ url: string; tipo: 'foto' | 'video' }>;
 }
 
 // Hook para gerenciar os dados das visitas
@@ -80,7 +81,8 @@ export const useVisitas = () => {
           depositos_tratados: visita.depositos_tratados,
           coleta_amostras: visita.coleta_amostras,
           amostras_enviadas: visita.amostras_enviadas,
-          observacoes_gerais: visita.observacoes_gerais
+          observacoes_gerais: visita.observacoes_gerais,
+          arquivos: visita.arquivos || []
         }));
         
         setVisitas(visitasFormatadas);
@@ -149,7 +151,8 @@ export const useVisitas = () => {
         depositos_tratados: visitaData.depositos_tratados,
         coleta_amostras: visitaData.coleta_amostras,
         amostras_enviadas: visitaData.amostras_enviadas,
-        observacoes_gerais: visitaData.observacoes_gerais || null
+        observacoes_gerais: visitaData.observacoes_gerais || null,
+        arquivos: visitaData.arquivos || [] // Adicionando arquivos à visita
       };
 
       const { data, error } = await supabase
@@ -193,7 +196,8 @@ export const useVisitas = () => {
         depositos_tratados: data.depositos_tratados,
         coleta_amostras: data.coleta_amostras,
         amostras_enviadas: data.amostras_enviadas,
-        observacoes_gerais: data.observacoes_gerais
+        observacoes_gerais: data.observacoes_gerais,
+        arquivos: data.arquivos || []
       };
 
       // Atualiza o estado local para refletir a nova visita
