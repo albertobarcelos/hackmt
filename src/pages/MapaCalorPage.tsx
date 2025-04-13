@@ -14,7 +14,7 @@ const MapaCalorPage: React.FC = () => {
     if (!document.getElementById('google-maps-script')) {
       const googleMapsScript = document.createElement('script');
       googleMapsScript.id = 'google-maps-script';
-      googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=visualization&callback=initMap`;
+      googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyARNjoxDqLCBPoaGYLEu7TYjhrwwL0cVhw&libraries=visualization&callback=initMap`;
       googleMapsScript.async = true;
       googleMapsScript.defer = true;
       
