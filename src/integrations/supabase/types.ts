@@ -9,7 +9,87 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      visitas: {
+        Row: {
+          adulticida_utilizado: string
+          amostras_enviadas: number
+          casa_id: string
+          coleta_amostras: string
+          data_visita: string
+          depositos_a1: number
+          depositos_a2: number
+          depositos_b: number
+          depositos_c: number
+          depositos_d1: number
+          depositos_d2: number
+          depositos_e: number
+          depositos_tratados: number
+          endereco: string
+          id: string
+          larvicida_utilizado: string
+          nome_agente: string
+          observacoes_gerais: string | null
+          pendencia: string | null
+          quantidade_larvicida: number
+          situacao_imovel: string
+          supervisor: string
+          tempo_visita: number
+          tipo_imovel: string
+        }
+        Insert: {
+          adulticida_utilizado: string
+          amostras_enviadas?: number
+          casa_id: string
+          coleta_amostras: string
+          data_visita?: string
+          depositos_a1?: number
+          depositos_a2?: number
+          depositos_b?: number
+          depositos_c?: number
+          depositos_d1?: number
+          depositos_d2?: number
+          depositos_e?: number
+          depositos_tratados?: number
+          endereco: string
+          id?: string
+          larvicida_utilizado: string
+          nome_agente: string
+          observacoes_gerais?: string | null
+          pendencia?: string | null
+          quantidade_larvicida?: number
+          situacao_imovel: string
+          supervisor: string
+          tempo_visita: number
+          tipo_imovel: string
+        }
+        Update: {
+          adulticida_utilizado?: string
+          amostras_enviadas?: number
+          casa_id?: string
+          coleta_amostras?: string
+          data_visita?: string
+          depositos_a1?: number
+          depositos_a2?: number
+          depositos_b?: number
+          depositos_c?: number
+          depositos_d1?: number
+          depositos_d2?: number
+          depositos_e?: number
+          depositos_tratados?: number
+          endereco?: string
+          id?: string
+          larvicida_utilizado?: string
+          nome_agente?: string
+          observacoes_gerais?: string | null
+          pendencia?: string | null
+          quantidade_larvicida?: number
+          situacao_imovel?: string
+          supervisor?: string
+          tempo_visita?: number
+          tipo_imovel?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

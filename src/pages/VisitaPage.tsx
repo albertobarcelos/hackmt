@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VisitaPage: React.FC = () => {
   const { casaId } = useParams<{ casaId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { adicionarVisita, obterVisitasPorCasa, obterDetalhesVisita } = useVisitas();
+  const { adicionarVisita, obterVisitasPorCasa, obterDetalhesVisita, isLoading } = useVisitas();
   
   const [endereco, setEndereco] = useState<string>("");
   const [visitaSelecionadaId, setVisitaSelecionadaId] = useState<string | null>(null);
@@ -46,7 +47,7 @@ const VisitaPage: React.FC = () => {
     : null;
   
   // Função para salvar os dados da visita
-  const handleSalvarVisita = (dados: any) => {
+  const handleSalvarVisita = async (dados: any) => {
     if (!casaId) {
       toast({
         title: "Erro",
@@ -56,8 +57,15 @@ const VisitaPage: React.FC = () => {
       return;
     }
     
-    adicionarVisita(dados, endereco);
-    setExibirHistorico(true);
+    const resultado = await adicionarVisita(dados, endereco);
+    if (resultado) {
+      setExibirHistorico(true);
+      toast({
+        title: "Sucesso",
+        description: "Visita registrada com sucesso!",
+        variant: "default"
+      });
+    }
   };
   
   // Função para voltar à página anterior
@@ -79,6 +87,26 @@ const VisitaPage: React.FC = () => {
   const toggleExibicao = () => {
     setExibirHistorico(!exibirHistorico);
   };
+
+  // Renderizando o esqueleto de carregamento
+  if (isLoading) {
+    return (
+      <div className="container mx-auto max-w-4xl px-4 pt-4 pb-16">
+        <div className="mb-6 flex items-center">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="ml-auto h-10 w-32" />
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-64" />
+          <div className="space-y-4">
+            {Array(3).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-24 w-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-4 pb-16">
