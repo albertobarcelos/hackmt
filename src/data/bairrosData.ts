@@ -13,7 +13,7 @@ interface Casa {
   position: { lat: number; lng: number };
 }
 
-// Coordenadas mais precisas para Cáceres-MT
+// Coordenadas atualizadas e mais precisas para Cáceres-MT
 export const bairrosData: Bairro[] = [
   { id: "1", nome: "Centro", center: { lat: -16.0731, lng: -57.6824 } },
   { id: "2", nome: "Santa Luzia", center: { lat: -16.0648, lng: -57.6732 } },
@@ -25,23 +25,23 @@ export const bairrosData: Bairro[] = [
 // Renomeando para bairros para ser usado na importação
 export const bairros = bairrosData;
 
-// Adicionando casas para cada bairro
+// Atualizando as casas para serem mais próximas das coordenadas de cada bairro
 export const casasPorBairro: Record<string, Casa[]> = {
   "1": [
-    { id: "101", endereco: "Rua Principal", numero: "123", referencia: "Próximo à praça", position: { lat: -16.0721, lng: -57.6814 } },
+    { id: "101", endereco: "Rua Principal", numero: "123", referencia: "Próximo à praça", position: { lat: -16.0731, lng: -57.6824 } },
     { id: "102", endereco: "Avenida Central", numero: "45", position: { lat: -16.0741, lng: -57.6834 } },
-    { id: "103", endereco: "Rua das Flores", numero: "78", referencia: "Em frente ao mercado", position: { lat: -16.0711, lng: -57.6804 } }
+    { id: "103", endereco: "Rua das Flores", numero: "78", referencia: "Em frente ao mercado", position: { lat: -16.0721, lng: -57.6814 } }
   ],
   "2": [
-    { id: "201", endereco: "Rua Santa Luzia", numero: "55", position: { lat: -16.0638, lng: -57.6722 } },
+    { id: "201", endereco: "Rua Santa Luzia", numero: "55", position: { lat: -16.0648, lng: -57.6732 } },
     { id: "202", endereco: "Travessa dos Santos", numero: "22", referencia: "Ao lado da igreja", position: { lat: -16.0658, lng: -57.6742 } }
   ],
   "3": [
-    { id: "301", endereco: "Rua São Paulo", numero: "100", position: { lat: -16.0779, lng: -57.6746 } },
+    { id: "301", endereco: "Rua São Paulo", numero: "100", position: { lat: -16.0789, lng: -57.6756 } },
     { id: "302", endereco: "Avenida Jardim", numero: "200", referencia: "Próximo ao parque", position: { lat: -16.0799, lng: -57.6766 } }
   ],
   "4": [
-    { id: "401", endereco: "Rua Nova", numero: "15", position: { lat: -16.0805, lng: -57.6881 } },
+    { id: "401", endereco: "Rua Nova", numero: "15", position: { lat: -16.0815, lng: -57.6891 } },
     { id: "402", endereco: "Travessa Vila", numero: "30", referencia: "Perto da escola", position: { lat: -16.0825, lng: -57.6901 } }
   ],
   "5": [

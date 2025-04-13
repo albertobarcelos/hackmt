@@ -70,17 +70,17 @@ const MapaCalorPage: React.FC = () => {
         return contador;
       }, {} as Record<string, number>);
       
-      // Coordenadas para Cáceres-MT (ao invés das coordenadas do Pantanal)
-      // Usando coordenadas mais precisas para os bairros de Cáceres
+      // Gerar áreas não visitadas ao redor do bairro selecionado
+      // Usando coordenadas específicas para o bairro de Cáceres
       const areasNaoVisitadas = [
-        { endereco: "Av. Brasil 450, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.006, lng: bairroInfo.center.lng - 0.005, frequencia: 0 },
-        { endereco: "Rua das Flores 123, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.003, lng: bairroInfo.center.lng - 0.006, frequencia: 0 },
-        { endereco: "Alameda Santos 789, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.005, lng: bairroInfo.center.lng - 0.002, frequencia: 0 },
-        { endereco: "Rua Piratininga 345, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.002, lng: bairroInfo.center.lng + 0.008, frequencia: 0 },
-        { endereco: "Av. Paulista 100, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.003, lng: bairroInfo.center.lng + 0.003, frequencia: 0 },
-        { endereco: "Rua Augusta 500, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.004, lng: bairroInfo.center.lng + 0.003, frequencia: 0 },
-        { endereco: "Rua Consolação 250, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.006, lng: bairroInfo.center.lng - 0.004, frequencia: 0 },
-        { endereco: "Av. Rebouças 150, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.002, lng: bairroInfo.center.lng - 0.009, frequencia: 0 },
+        { endereco: "Av. Brasil 450, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.001, lng: bairroInfo.center.lng - 0.001, frequencia: 0 },
+        { endereco: "Rua das Flores 123, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.0005, lng: bairroInfo.center.lng - 0.002, frequencia: 0 },
+        { endereco: "Alameda Santos 789, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.001, lng: bairroInfo.center.lng - 0.0005, frequencia: 0 },
+        { endereco: "Rua Piratininga 345, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.0008, lng: bairroInfo.center.lng + 0.002, frequencia: 0 },
+        { endereco: "Av. Paulista 100, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.001, lng: bairroInfo.center.lng + 0.001, frequencia: 0 },
+        { endereco: "Rua Augusta 500, " + bairroInfo.nome, lat: bairroInfo.center.lat - 0.001, lng: bairroInfo.center.lng + 0.0015, frequencia: 0 },
+        { endereco: "Rua Consolação 250, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.002, lng: bairroInfo.center.lng - 0.001, frequencia: 0 },
+        { endereco: "Av. Rebouças 150, " + bairroInfo.nome, lat: bairroInfo.center.lat + 0.0005, lng: bairroInfo.center.lng - 0.003, frequencia: 0 },
       ];
       
       return {
@@ -112,6 +112,8 @@ const MapaCalorPage: React.FC = () => {
         const bairroInfo = bairros.find(b => b.id === bairroSelecionado);
         if (!bairroInfo) return;
         
+        console.log("Inicializando mapa para o bairro:", bairroInfo.nome, "Coords:", bairroInfo.center);
+        
         // Centro do mapa nas coordenadas do bairro selecionado
         const centerCoordinates = new google.maps.LatLng(
           bairroInfo.center.lat,
@@ -120,7 +122,7 @@ const MapaCalorPage: React.FC = () => {
         
         // Configurações do mapa com zoom aumentado
         const mapOptions = {
-          zoom: 16, // Aumentado para um zoom maior
+          zoom: 17, // Zoom mais alto para focar melhor no bairro
           center: centerCoordinates,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           styles: [
@@ -144,6 +146,21 @@ const MapaCalorPage: React.FC = () => {
         // Buscar dados e criar o mapa de calor
         const { areasNaoVisitadas } = await carregarDadosVisitas(bairroSelecionado);
         
+        // Adicionar marcador para o centro do bairro
+        new google.maps.Marker({
+          position: centerCoordinates,
+          map: newMap,
+          title: `Centro de ${bairroInfo.nome}`,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#4285F4',
+            fillOpacity: 0.8,
+            strokeColor: '#4285F4',
+            strokeWeight: 1,
+            scale: 10
+          }
+        });
+        
         // Dados para o mapa de calor - áreas não visitadas (prioridade)
         const naoVisitadasData = areasNaoVisitadas.map(area => ({
           location: new google.maps.LatLng(area.lat, area.lng),
@@ -154,7 +171,7 @@ const MapaCalorPage: React.FC = () => {
         const newHeatmapNaoVisitadas = new google.maps.visualization.HeatmapLayer({
           data: naoVisitadasData,
           map: newMap,
-          radius: 50,
+          radius: 30, // Reduzido para focar melhor em áreas específicas
           gradient: [
             'rgba(0, 0, 0, 0)',     // transparente no início
             'rgba(255, 165, 0, 0.6)', // laranja para áreas menos críticas
