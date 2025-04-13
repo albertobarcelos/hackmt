@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -11,12 +10,12 @@ import CasaSearch from "@/components/localizacao/CasaSearch";
 import GoogleMapsViewer from "@/components/localizacao/GoogleMapsViewer";
 import VisualizacaoToggle from "@/components/localizacao/VisualizacaoToggle";
 
-// Usando uma chave padrão para testes (normalmente isso deveria vir de uma variável de ambiente)
 const GOOGLE_MAPS_API_KEY = "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg";
 
 const LocalizacaoMapaPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
   const [bairroSelecionado, setBairroSelecionado] = useState<string>("");
   const [casasFiltradas, setCasasFiltradas] = useState<Array<{ 
     id: string; 
@@ -25,6 +24,7 @@ const LocalizacaoMapaPage: React.FC = () => {
     referencia?: string;
     position: { lat: number; lng: number };
   }>>([]);
+  
   const [termoBusca, setTermoBusca] = useState<string>("");
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: -23.550520, lng: -46.633308 });
@@ -43,16 +43,21 @@ const LocalizacaoMapaPage: React.FC = () => {
     setMap(null);
   }, []);
 
+  useEffect(() => {
+    if (map) {
+      map.panTo(mapCenter);
+      map.setZoom(16);
+    }
+  }, [mapCenter, map]);
+
   const handleBairroChange = (value: string) => {
     setBairroSelecionado(value);
     setCasasFiltradas(casasPorBairro[value] || []);
     setTermoBusca("");
-    
+
     const bairroSelecionadoObj = bairros.find(b => b.id === value);
-    if (bairroSelecionadoObj && map) {
+    if (bairroSelecionadoObj) {
       setMapCenter(bairroSelecionadoObj.center);
-      map.panTo(bairroSelecionadoObj.center);
-      map.setZoom(16);
     }
   };
 
