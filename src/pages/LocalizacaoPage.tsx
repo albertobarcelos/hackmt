@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Map } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
@@ -109,6 +109,18 @@ const LocalizacaoPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Botão para alternar para visualização de mapa */}
+      <div className="mb-4">
+        <Button 
+          className="w-full flex justify-center items-center gap-2"
+          variant="outline"
+          onClick={() => navigate('/localizacao-mapa')}
+        >
+          <Map size={16} />
+          <span>Ver no mapa</span>
+        </Button>
+      </div>
 
       {/* Lista de Casas (aparece apenas quando um bairro é selecionado) */}
       {bairroSelecionado && (

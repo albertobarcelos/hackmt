@@ -53,6 +53,11 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       name: "Localização",
       icon: <MapPin size={20} />,
     },
+    {
+      path: "/localizacao-mapa",
+      name: "Mapa de Visitas",
+      icon: <MapPin size={20} />,
+    },
   ];
 
   const isActive = (path: string) => {
