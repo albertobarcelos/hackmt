@@ -25,9 +25,10 @@ import InsumosSummary from "@/components/dashboard/InsumosSummary";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import WeeklyReportModal from "@/components/dashboard/WeeklyReportModal";
+import { DateRange } from "react-day-picker";
 
 const DashboardPage: React.FC = () => {
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().setDate(new Date().getDate() - 7)),
     to: new Date(),
   });
@@ -45,6 +46,12 @@ const DashboardPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (range) {
+      setDateRange(range);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -55,7 +62,7 @@ const DashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
-          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          <DatePickerWithRange date={dateRange} setDate={handleDateRangeChange} />
           <div className="flex gap-2">
             <Button 
               variant="outline" 

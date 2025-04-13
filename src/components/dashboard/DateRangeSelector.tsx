@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/popover";
 
 interface DatePickerWithRangeProps {
-  date: DateRange;
-  setDate: (date: DateRange) => void;
+  date: DateRange | undefined;
+  setDate: (date: DateRange | undefined) => void;
   className?: string;
 }
 
-export function DatePickerWithRange({
+export const DatePickerWithRange = ({
   date,
   setDate,
   className,
-}: DatePickerWithRangeProps) {
+}: DatePickerWithRangeProps) => {
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -58,9 +58,10 @@ export function DatePickerWithRange({
             selected={date}
             onSelect={setDate}
             numberOfMonths={2}
+            className="p-3 pointer-events-auto"
           />
         </PopoverContent>
       </Popover>
     </div>
   );
-}
+};
