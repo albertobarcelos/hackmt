@@ -1,131 +1,117 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Activity,
-  CreditCard,
-  DollarSign,
+  Droplet,
+  Home,
+  Building,
   Users,
-  ShoppingCart,
+  Calendar,
+  Filter,
+  Syringe,
+  FlaskConical,
+  Truck,
+  Flag,
 } from "lucide-react";
-import StatsCard from "@/components/dashboard/StatsCard";
-import AreaChart from "@/components/dashboard/AreaChart";
-import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
-import { Activity as ActivityType } from "@/lib/types";
-
-const chartData = [
-  { name: "Jan", value: 400 },
-  { name: "Feb", value: 600 },
-  { name: "Mar", value: 500 },
-  { name: "Apr", value: 780 },
-  { name: "May", value: 700 },
-  { name: "Jun", value: 950 },
-  { name: "Jul", value: 1100 },
-];
-
-const usersData = [
-  { name: "Jan", value: 50 },
-  { name: "Feb", value: 80 },
-  { name: "Mar", value: 110 },
-  { name: "Apr", value: 130 },
-  { name: "May", value: 170 },
-  { name: "Jun", value: 220 },
-  { name: "Jul", value: 290 },
-];
-
-const activities: ActivityType[] = [
-  {
-    id: "1",
-    user: { name: "John Doe" },
-    action: "created a new task",
-    target: "Project X Launch",
-    timestamp: "Just now",
-  },
-  {
-    id: "2",
-    user: { name: "Alice Miller" },
-    action: "updated the status of",
-    target: "Website Redesign",
-    timestamp: "2 hours ago",
-  },
-  {
-    id: "3",
-    user: { name: "Robert Johnson" },
-    action: "completed",
-    target: "Quarterly Reports",
-    timestamp: "5 hours ago",
-  },
-  {
-    id: "4",
-    user: { name: "Emma Wilson" },
-    action: "assigned",
-    target: "New Feature Development",
-    timestamp: "Yesterday",
-  },
-  {
-    id: "5",
-    user: { name: "Michael Brown" },
-    action: "commented on",
-    target: "Bug #4321",
-    timestamp: "2 days ago",
-  },
-];
+import { DatePickerWithRange } from "@/components/dashboard/DateRangeSelector";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StatusSummary from "@/components/dashboard/StatusSummary";
+import DepositosChart from "@/components/dashboard/DepositosChart";
+import TipoImoveisChart from "@/components/dashboard/TipoImoveisChart";
+import AgentesPerformance from "@/components/dashboard/AgentesPerformance";
+import LaboratorioSummary from "@/components/dashboard/LaboratorioSummary";
+import RankingBairros from "@/components/dashboard/RankingBairros";
+import InsumosSummary from "@/components/dashboard/InsumosSummary";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import WeeklyReportModal from "@/components/dashboard/WeeklyReportModal";
 
 const DashboardPage: React.FC = () => {
+  const [dateRange, setDateRange] = useState({
+    from: new Date(new Date().setDate(new Date().getDate() - 7)),
+    to: new Date(),
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { toast } = useToast();
+  
+  const handleExportClick = () => {
+    toast({
+      title: "Relatório exportado",
+      description: "O relatório semanal foi exportado com sucesso.",
+    });
+  };
+
+  const handleGenerateWeeklyReport = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Welcome back! Here's an overview of your data.
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard do Supervisor</h1>
+          <p className="text-muted-foreground mt-1">
+            Acompanhamento e consolidação dos dados de campo
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <DatePickerWithRange date={dateRange} setDate={setDateRange} />
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleExportClick}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Exportar
+            </Button>
+            <Button 
+              onClick={handleGenerateWeeklyReport}
+              className="gap-2 bg-primary"
+            >
+              <Calendar className="h-4 w-4" /> 
+              Gerar Relatório Semanal
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
-          title="Total Revenue"
-          value="$13,456.78"
-          icon={<DollarSign size={20} />}
-          trend={{ value: 12.5, isPositive: true }}
-        />
-        <StatsCard
-          title="New Users"
-          value="2,345"
-          icon={<Users size={20} />}
-          trend={{ value: 18.2, isPositive: true }}
-        />
-        <StatsCard
-          title="Orders"
-          value="452"
-          icon={<ShoppingCart size={20} />}
-          trend={{ value: 5.3, isPositive: false }}
-        />
-        <StatsCard
-          title="Payments"
-          value="$4,679.23"
-          icon={<CreditCard size={20} />}
-          trend={{ value: 8.9, isPositive: true }}
-        />
-      </div>
+      <StatusSummary dateRange={dateRange} />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <AreaChart
-          title="Revenue Growth"
-          data={chartData}
-          dataKey="value"
-          height={320}
-        />
-        <AreaChart
-          title="User Growth"
-          data={usersData}
-          dataKey="value"
-          height={320}
-          areaColor="hsla(130, 60%, 59%, 0.8)"
-        />
-      </div>
+      <Tabs defaultValue="resumo" className="w-full">
+        <TabsList className="grid grid-cols-4 md:w-auto md:grid-cols-4">
+          <TabsTrigger value="resumo">Resumo</TabsTrigger>
+          <TabsTrigger value="depositos">Depósitos</TabsTrigger>
+          <TabsTrigger value="agentes">Agentes</TabsTrigger>
+          <TabsTrigger value="laboratorio">Laboratório</TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
-        <RecentActivityCard activities={activities} />
-      </div>
+        <TabsContent value="resumo" className="space-y-6 mt-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <TipoImoveisChart dateRange={dateRange} />
+            <RankingBairros dateRange={dateRange} />
+          </div>
+          <InsumosSummary dateRange={dateRange} />
+        </TabsContent>
+        
+        <TabsContent value="depositos" className="mt-6">
+          <DepositosChart dateRange={dateRange} />
+        </TabsContent>
+        
+        <TabsContent value="agentes" className="mt-6">
+          <AgentesPerformance dateRange={dateRange} />
+        </TabsContent>
+        
+        <TabsContent value="laboratorio" className="mt-6">
+          <LaboratorioSummary dateRange={dateRange} />
+        </TabsContent>
+      </Tabs>
+      
+      <WeeklyReportModal 
+        open={isModalOpen} 
+        onOpenChange={setIsModalOpen} 
+        dateRange={dateRange}
+      />
     </div>
   );
 };
