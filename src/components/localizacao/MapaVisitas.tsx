@@ -99,12 +99,14 @@ const MapaVisitas: React.FC<MapaVisitasProps> = ({
                 position={casa.position}
                 onClick={() => handleMarkerClick(casa.id)}
                 icon={{
-                  path: google.maps.SymbolPath.HOME,
+                  // Substituindo o SymbolPath.HOME (que não existe) por um símbolo de shape que represente uma casa
+                  path: "M12 2L2 12h3v8h14v-8h3L12 2z M7 17v-5h10v5", // Path SVG simples de uma casa
                   fillColor: temHistoricoVisitas(casa.id) ? '#22c55e' : '#ea384c',
                   fillOpacity: 0.8,
                   strokeColor: temHistoricoVisitas(casa.id) ? '#15803d' : '#be123c',
                   strokeWeight: 1,
-                  scale: 10
+                  scale: 1.5,
+                  anchor: new google.maps.Point(12, 17) // Âncora ajustada para o centro da base do ícone
                 }}
               />
             );
