@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/dashboard/DataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Route, Search, Plus, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import HistoricoVisitasAgente from "@/components/agentes/HistoricoVisitasAgente";
+import RotasAgente, { RotaItem } from "@/components/agentes/RotasAgente";
+import { useRotasAgentes } from "@/hooks/useRotasAgentes";
 import { TableData } from "@/lib/types";
 
 const mockAgentes: TableData[] = [
@@ -139,16 +140,23 @@ const mockVisitasAgentes = {
   ],
 };
 
-const mockRotasAgentes: { [key: string]: string[] } = {
-  "1": ["Rua das Flores", "Av. Brasil", "Rua Treze de Maio"],
-  "2": ["Rua dos Girassóis", "Av. das Nações", "Rua Quinze"],
-};
-
 const ruasDisponiveis = [
-  "Rua das Flores", "Av. Brasil", "Rua Treze de Maio", "Av. Paulista",
-  "Rua dos Girassóis", "Av. das Nações", "Rua Quinze", "Rua Augusta",
-  "Rua Oscar Freire", "Av. Brigadeiro", "Rua Liberdade", "Av. Rebouças",
-  "Rua Consolação", "Av. Santo Amaro", "Rua Joaquim Floriano", "Av. Berrini"
+  { rua: "Rua das Flores", bairro: "Centro" },
+  { rua: "Av. Brasil", bairro: "Centro" },
+  { rua: "Rua Treze de Maio", bairro: "Centro" },
+  { rua: "Av. Paulista", bairro: "Zona Norte" },
+  { rua: "Rua dos Girassóis", bairro: "Zona Leste" },
+  { rua: "Av. das Nações", bairro: "Zona Leste" },
+  { rua: "Rua Quinze", bairro: "Zona Leste" },
+  { rua: "Rua Augusta", bairro: "Zona Sul" },
+  { rua: "Rua Oscar Freire", bairro: "Zona Sul" },
+  { rua: "Av. Brigadeiro", bairro: "Zona Norte" },
+  { rua: "Rua Liberdade", bairro: "Centro" },
+  { rua: "Av. Rebouças", bairro: "Zona Oeste" },
+  { rua: "Rua Consolação", bairro: "Centro" },
+  { rua: "Av. Santo Amaro", bairro: "Zona Sul" },
+  { rua: "Rua Joaquim Floriano", bairro: "Zona Sul" },
+  { rua: "Av. Berrini", bairro: "Zona Sul" }
 ];
 
 const columns = [
@@ -251,9 +259,10 @@ const UsersPage: React.FC = () => {
   const [agenteDetalhesId, setAgenteDetalhesId] = useState<string | null>(null);
   const [definindoRotaParaId, setDefinindoRotaParaId] = useState<string | null>(null);
   const [buscarRua, setBuscarRua] = useState<string>("");
-  const [rotasSelecionadas, setRotasSelecionadas] = useState<string[]>([]);
+  const [rotasSelecionadas, setRotasSelecionadas] = useState<RotaItem[]>([]);
   const [verRotasId, setVerRotasId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { rotas, isLoading, salvarRotasAgente, obterRotasAgente } = useRotasAgentes();
   
   const agenteSelecionado = agenteDetalhesId 
     ? mockAgentes.find(a => a.id === agenteDetalhesId) 
@@ -266,6 +275,10 @@ const UsersPage: React.FC = () => {
   const visitasComDetalhes = visitasAgente.map(visita => {
     return {
       ...visita,
+      bairro: visita.endereco.includes("Flores") ? "Centro" : 
+             visita.endereco.includes("Brasil") ? "Centro" : 
+             visita.endereco.includes("Maio") ? "Centro" : 
+             visita.endereco.includes("Paulista") ? "Zona Norte" : "Outro",
       detalhes: {
         id: visita.id,
         casaId: `casa-${visita.id}`,
@@ -295,6 +308,12 @@ const UsersPage: React.FC = () => {
     };
   });
 
+  const getRuasDisponiveis = () => {
+    return ruasDisponiveis.filter(rota =>
+      !rotasSelecionadas.some(r => r.rua === rota.rua && r.bairro === rota.bairro)
+    );
+  };
+
   const handleAddUser = () => {
     toast({
       title: "Funcionalidade em desenvolvimento",
@@ -312,8 +331,16 @@ const UsersPage: React.FC = () => {
   
   const handleDefinirRota = (id: string) => {
     setDefinindoRotaParaId(id);
-    const rotasExistentes = mockRotasAgentes[id] || [];
-    setRotasSelecionadas([...rotasExistentes]);
+    setBuscarRua("");
+    
+    const rotasExistentes = obterRotasAgente(id);
+    
+    const rotasFormatadas = rotasExistentes.map(r => ({
+      rua: r.rua,
+      bairro: r.bairro
+    }));
+    
+    setRotasSelecionadas(rotasFormatadas);
   };
   
   const fecharDefinirRota = () => {
@@ -322,37 +349,49 @@ const UsersPage: React.FC = () => {
     setRotasSelecionadas([]);
   };
   
-  const adicionarRua = (rua: string) => {
-    if (!rotasSelecionadas.includes(rua)) {
-      setRotasSelecionadas([...rotasSelecionadas, rua]);
+  const adicionarRua = (rua: string, bairro: string) => {
+    if (!rotasSelecionadas.some(r => r.rua === rua && r.bairro === bairro)) {
+      setRotasSelecionadas([...rotasSelecionadas, { rua, bairro }]);
     }
   };
   
-  const removerRua = (rua: string) => {
-    setRotasSelecionadas(rotasSelecionadas.filter(r => r !== rua));
+  const removerRua = (rua: string, bairro: string) => {
+    setRotasSelecionadas(rotasSelecionadas.filter(
+      r => !(r.rua === rua && r.bairro === bairro)
+    ));
   };
   
-  const salvarRotas = () => {
+  const salvarRotas = async () => {
     if (definindoRotaParaId) {
-      toast({
-        title: "Rotas definidas",
-        description: `As rotas do agente foram atualizadas com sucesso.`,
-      });
-      fecharDefinirRota();
+      const salvou = await salvarRotasAgente(definindoRotaParaId, rotasSelecionadas);
+      
+      if (salvou) {
+        toast({
+          title: "Rotas definidas",
+          description: `As rotas do agente foram atualizadas com sucesso.`,
+        });
+        fecharDefinirRota();
+      }
     }
   };
   
   const handleVerRotas = (id: string) => {
     setVerRotasId(id);
+    
+    const rotasExistentes = obterRotasAgente(id);
+    
+    const rotasFormatadas = rotasExistentes.map(r => ({
+      rua: r.rua,
+      bairro: r.bairro
+    }));
+    
+    setRotasSelecionadas(rotasFormatadas);
   };
   
   const fecharVerRotas = () => {
     setVerRotasId(null);
+    setRotasSelecionadas([]);
   };
-  
-  const ruasFiltradas = ruasDisponiveis
-    .filter(rua => rua.toLowerCase().includes(buscarRua.toLowerCase()))
-    .filter(rua => !rotasSelecionadas.includes(rua));
 
   return (
     <div className="space-y-6">
@@ -454,78 +493,16 @@ const UsersPage: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Buscar rua..."
-                className="pl-8"
-                value={buscarRua}
-                onChange={(e) => setBuscarRua(e.target.value)}
-              />
-            </div>
-            
-            <div className="border rounded-md p-2 h-40 overflow-auto">
-              {ruasFiltradas.length > 0 ? (
-                <ul className="space-y-1">
-                  {ruasFiltradas.map((rua, index) => (
-                    <li key={index} className="flex justify-between items-center p-1 hover:bg-slate-50 rounded">
-                      <span>{rua}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => adicionarRua(rua)}
-                      >
-                        <Plus size={16} />
-                        <span className="sr-only">Adicionar</span>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-center py-2 text-muted-foreground">
-                  {buscarRua ? "Nenhuma rua encontrada" : "Todas as ruas já foram selecionadas"}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">Ruas selecionadas ({rotasSelecionadas.length})</h4>
-              <div className="border rounded-md p-2">
-                {rotasSelecionadas.length > 0 ? (
-                  <ul className="space-y-1">
-                    {rotasSelecionadas.map((rua, index) => (
-                      <li key={index} className="flex justify-between items-center p-1 hover:bg-slate-50 rounded">
-                        <span>{rua}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => removerRua(rua)}
-                        >
-                          <X size={16} />
-                          <span className="sr-only">Remover</span>
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center py-2 text-muted-foreground">
-                    Nenhuma rua selecionada
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={fecharDefinirRota}>Cancelar</Button>
-            <Button onClick={salvarRotas} disabled={rotasSelecionadas.length === 0}>
-              <Save size={16} className="mr-2" />
-              Salvar Rotas
-            </Button>
-          </DialogFooter>
+          <RotasAgente 
+            rotasSelecionadas={rotasSelecionadas}
+            onAdicionarRua={adicionarRua}
+            onRemoverRua={removerRua}
+            onSalvarRotas={salvarRotas}
+            ruasDisponiveis={getRuasDisponiveis()}
+            buscarRua={buscarRua}
+            onBuscarRuaChange={setBuscarRua}
+            modo="editar"
+          />
         </DialogContent>
       </Dialog>
       
@@ -538,24 +515,16 @@ const UsersPage: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4">
-            {verRotasId && mockRotasAgentes[verRotasId] ? (
-              <div className="border rounded-md p-4">
-                <ul className="space-y-2">
-                  {mockRotasAgentes[verRotasId].map((rua, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <MapPin size={16} className="text-blue-500" />
-                      <span>{rua}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p className="text-center py-2 text-muted-foreground">
-                Este agente ainda não possui rotas definidas.
-              </p>
-            )}
-          </div>
+          <RotasAgente 
+            rotasSelecionadas={rotasSelecionadas}
+            onAdicionarRua={() => {}}
+            onRemoverRua={() => {}}
+            onSalvarRotas={() => {}}
+            ruasDisponiveis={[]}
+            buscarRua=""
+            onBuscarRuaChange={() => {}}
+            modo="visualizar"
+          />
           
           <DialogFooter>
             <Button onClick={fecharVerRotas}>Fechar</Button>

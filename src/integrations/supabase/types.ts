@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      rotas_agentes: {
+        Row: {
+          agente_id: string
+          bairro: string
+          created_at: string | null
+          id: string
+          rua: string
+        }
+        Insert: {
+          agente_id: string
+          bairro: string
+          created_at?: string | null
+          id?: string
+          rua: string
+        }
+        Update: {
+          agente_id?: string
+          bairro?: string
+          created_at?: string | null
+          id?: string
+          rua?: string
+        }
+        Relationships: []
+      }
       visitas: {
         Row: {
           adulticida_utilizado: string
