@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,9 +52,8 @@ const casasPorBairro: Record<string, Array<{
   ],
 };
 
-// Você precisará obter uma chave de API do Google Maps
-// Para fins de desenvolvimento, vamos usar um placeholder
-const GOOGLE_MAPS_API_KEY = "SUA_CHAVE_API_AQUI";
+// Usando uma chave padrão para testes (normalmente isso deveria vir de uma variável de ambiente)
+const GOOGLE_MAPS_API_KEY = "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg";
 
 const containerStyle = {
   width: '100%',
@@ -91,13 +89,11 @@ const LocalizacaoMapaPage: React.FC = () => {
     setMap(null);
   }, []);
 
-  // Ao selecionar um bairro, carregamos as casas correspondentes
   const handleBairroChange = (value: string) => {
     setBairroSelecionado(value);
     setCasasFiltradas(casasPorBairro[value] || []);
     setTermoBusca("");
     
-    // Centralize o mapa no bairro selecionado
     const bairroSelecionadoObj = bairros.find(b => b.id === value);
     if (bairroSelecionadoObj && map) {
       setMapCenter(bairroSelecionadoObj.center);
@@ -106,7 +102,6 @@ const LocalizacaoMapaPage: React.FC = () => {
     }
   };
 
-  // Filtragem de casas por termo de busca
   const handleBuscaCasa = (e: React.ChangeEvent<HTMLInputElement>) => {
     const termo = e.target.value.toLowerCase();
     setTermoBusca(termo);
@@ -125,24 +120,20 @@ const LocalizacaoMapaPage: React.FC = () => {
     }
   };
 
-  // Simulação de navegação para o formulário da casa
   const abrirFormularioCasa = (casaId: string) => {
-    // Aqui você navegaria para o formulário da casa específica
     console.log(`Abrindo formulário para casa ID: ${casaId}`);
     toast({
       title: "Casa selecionada",
       description: `Formulário para casa ID: ${casaId} será aberto`
     });
-    // navigate(`/formulario-casa/${casaId}`);
     alert(`Formulário para casa ID: ${casaId} será implementado em breve!`);
-    setSelectedMarker(null); // Fechar o InfoWindow após selecionar
+    setSelectedMarker(null);
   };
 
   return (
     <div className="container mx-auto max-w-md p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Mapa de Visitas</h1>
       
-      {/* Seleção de Bairro */}
       <Card className="mb-6">
         <CardContent className="pt-4">
           <div className="space-y-4">
@@ -163,7 +154,6 @@ const LocalizacaoMapaPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Barra de pesquisa */}
       {bairroSelecionado && (
         <div className="mb-4">
           <div className="relative">
@@ -179,7 +169,6 @@ const LocalizacaoMapaPage: React.FC = () => {
         </div>
       )}
 
-      {/* Componente do Mapa */}
       {isLoaded ? (
         <Card className="overflow-hidden mb-4 shadow-lg">
           <CardContent className="p-0">
@@ -241,7 +230,6 @@ const LocalizacaoMapaPage: React.FC = () => {
         </Card>
       )}
       
-      {/* Botão para alternar entre visualização de lista e mapa */}
       <div className="mt-4 flex justify-center">
         <Button
           className="flex items-center gap-2"
