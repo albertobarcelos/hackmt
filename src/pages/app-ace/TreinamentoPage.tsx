@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileVideo, FileText, ExternalLink, Play, BookOpen } from "lucide-react";
+import { FileVideo, FileText, ExternalLink, Play, BookOpen, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Dados de exemplo para materiais de treinamento
