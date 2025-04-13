@@ -5,7 +5,7 @@ import FormularioVisita from "@/components/visita/FormularioVisita";
 import HistoricoVisitas from "@/components/visita/HistoricoVisitas";
 import DetalhesVisita from "@/components/visita/DetalhesVisita";
 import { useVisitas } from "@/hooks/useVisitas";
-import { Button } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { X, ArrowLeft } from "lucide-react";
