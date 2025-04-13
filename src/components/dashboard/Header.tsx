@@ -1,48 +1,27 @@
-
 import { useState } from "react";
 import { Bell, Menu, Search, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-
 interface HeaderProps {
   toggleSidebar: () => void;
 }
-
-const Header = ({ toggleSidebar }: HeaderProps) => {
+const Header = ({
+  toggleSidebar
+}: HeaderProps) => {
   const [searchValue, setSearchValue] = useState("");
-
-  return (
-    <header className="h-14 border-b px-4 flex items-center justify-between bg-background">
+  return <header className="h-14 border-b px-4 flex items-center justify-between bg-background">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleSidebar}
-        >
+        <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleSidebar}>
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
 
         <div className="hidden md:flex relative max-w-md">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="pl-8 w-[280px] bg-background"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
+          
+          
         </div>
       </div>
 
@@ -61,8 +40,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-[300px] overflow-auto">
-              {[1, 2, 3].map((i) => (
-                <DropdownMenuItem key={i} className="py-3 cursor-pointer">
+              {[1, 2, 3].map(i => <DropdownMenuItem key={i} className="py-3 cursor-pointer">
                   <div className="flex items-start gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="" />
@@ -72,30 +50,17 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                     </Avatar>
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-medium leading-none">
-                        {i === 1
-                          ? "New user registered"
-                          : i === 2
-                          ? "Report generated"
-                          : "Task completed"}
+                        {i === 1 ? "New user registered" : i === 2 ? "Report generated" : "Task completed"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {i === 1
-                          ? "John Doe just signed up"
-                          : i === 2
-                          ? "Monthly report is ready to view"
-                          : "Task #5123 marked as completed"}
+                        {i === 1 ? "John Doe just signed up" : i === 2 ? "Monthly report is ready to view" : "Task #5123 marked as completed"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {i === 1
-                          ? "2 minutes ago"
-                          : i === 2
-                          ? "1 hour ago"
-                          : "5 hours ago"}
+                        {i === 1 ? "2 minutes ago" : i === 2 ? "1 hour ago" : "5 hours ago"}
                       </p>
                     </div>
                   </div>
-                </DropdownMenuItem>
-              ))}
+                </DropdownMenuItem>)}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="justify-center text-primary">
@@ -129,11 +94,9 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
-  );
+    </header>;
 };
 
 // Add missing imports
 import { Settings, LogOut } from "lucide-react";
-
 export default Header;
