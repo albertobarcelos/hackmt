@@ -29,6 +29,7 @@ interface DataTableProps {
     cell?: (item: any) => React.ReactNode;
   }[];
   onAddNew?: () => void;
+  onRowClick?: (id: string) => void;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -36,6 +37,7 @@ const DataTable: React.FC<DataTableProps> = ({
   data,
   columns,
   onAddNew,
+  onRowClick,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +58,12 @@ const DataTable: React.FC<DataTableProps> = ({
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
+  const handleRowClick = (id: string) => {
+    if (onRowClick) {
+      onRowClick(id);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="px-6">
@@ -66,7 +74,7 @@ const DataTable: React.FC<DataTableProps> = ({
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search..."
+                placeholder="Buscar..."
                 className="w-[200px] pl-8"
                 value={searchTerm}
                 onChange={(e) => {
@@ -78,7 +86,7 @@ const DataTable: React.FC<DataTableProps> = ({
             {onAddNew && (
               <Button onClick={onAddNew} size="sm">
                 <Plus className="h-4 w-4 mr-1" />
-                Add New
+                Adicionar
               </Button>
             )}
           </div>
@@ -92,13 +100,17 @@ const DataTable: React.FC<DataTableProps> = ({
                 {columns.map((column) => (
                   <TableHead key={column.key}>{column.header}</TableHead>
                 ))}
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead className="w-[80px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow 
+                    key={item.id} 
+                    className={onRowClick ? "cursor-pointer" : ""}
+                    onClick={() => onRowClick && handleRowClick(item.id)}
+                  >
                     {columns.map((column) => (
                       <TableCell key={`${item.id}-${column.key}`}>
                         {column.cell
@@ -113,27 +125,37 @@ const DataTable: React.FC<DataTableProps> = ({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 p-0"
+                            onClick={(e) => e.stopPropagation()} // Evita que o clique propague para a linha
                           >
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">Abrir menu</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => console.log("View", item.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("Ver", item.id);
+                            }}
                           >
-                            View
+                            Visualizar
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => console.log("Edit", item.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("Editar", item.id);
+                            }}
                           >
-                            Edit
+                            Editar
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => console.log("Delete", item.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("Excluir", item.id);
+                            }}
                             className="text-destructive focus:text-destructive"
                           >
-                            Delete
+                            Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -146,7 +168,7 @@ const DataTable: React.FC<DataTableProps> = ({
                     colSpan={columns.length + 1}
                     className="h-32 text-center"
                   >
-                    No results found.
+                    Nenhum resultado encontrado.
                   </TableCell>
                 </TableRow>
               )}
@@ -157,16 +179,16 @@ const DataTable: React.FC<DataTableProps> = ({
         {totalPages > 1 && (
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-sm text-muted-foreground">
-              Showing{" "}
+              Mostrando{" "}
               <span className="font-medium">
                 {(currentPage - 1) * itemsPerPage + 1}
               </span>{" "}
-              to{" "}
+              a{" "}
               <span className="font-medium">
                 {Math.min(currentPage * itemsPerPage, filteredData.length)}
               </span>{" "}
-              of <span className="font-medium">{filteredData.length}</span>{" "}
-              results
+              de <span className="font-medium">{filteredData.length}</span>{" "}
+              resultados
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -176,7 +198,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Previous Page</span>
+                <span className="sr-only">Página Anterior</span>
               </Button>
               <Button
                 variant="outline"
@@ -187,7 +209,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
-                <span className="sr-only">Next Page</span>
+                <span className="sr-only">Próxima Página</span>
               </Button>
             </div>
           </div>

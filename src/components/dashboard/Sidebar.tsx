@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -44,7 +45,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     },
     {
       path: "/users",
-      name: "Users",
+      name: "Agentes",
       icon: <Users size={20} />,
     },
     {
