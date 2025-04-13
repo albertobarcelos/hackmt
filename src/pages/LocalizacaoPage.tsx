@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Clock, ArrowRight } from "lucide-react";
 import { useVisitas } from "@/hooks/useVisitas";
 import BairroSelector from "@/components/localizacao/BairroSelector";
 import CasaSearch from "@/components/localizacao/CasaSearch";
 import ListaCasas from "@/components/localizacao/ListaCasas";
 import { bairrosData } from "@/data/bairrosData";
+import MobileNavbar from "@/components/mobile/MobileNavbar";
 
 // Dados fictícios de casas por bairro
 const casasPorBairro: Record<string, Array<{ id: string; endereco: string; numero: string; referencia?: string }>> = {
@@ -105,46 +105,53 @@ const LocalizacaoPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-md p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Localização de Visitas</h1>
-      
-      <BairroSelector
-        bairros={bairrosData}
-        bairroSelecionado={bairroSelecionado}
-        onBairroChange={handleBairroChange}
-      />
-
-      {bairroSelecionado && (
-        <div className="space-y-4 mt-4">
-          <CasaSearch 
-            termoBusca={termoBusca}
-            onSearchChange={handleBuscaCasa}
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen pb-16">
+      <div className="max-w-md mx-auto p-4">
+        <div className="py-4">
+          <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Visitas</h1>
+          
+          <BairroSelector
+            bairros={bairrosData}
+            bairroSelecionado={bairroSelecionado}
+            onBairroChange={handleBairroChange}
           />
 
-          <h2 className="text-lg font-medium text-blue-800">
-            Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
-          </h2>
+          {bairroSelecionado && (
+            <div className="space-y-4 mt-4">
+              <CasaSearch 
+                termoBusca={termoBusca}
+                onSearchChange={handleBuscaCasa}
+              />
 
-          {casasFiltradas.length > 0 ? (
-            <ListaCasas 
-              casas={casasFiltradas}
-              temHistoricoVisitas={temHistoricoVisitas}
-              onAbrirFormulario={abrirFormularioCasa}
-              onAbrirHistorico={abrirHistoricoVisitas}
-            />
-          ) : (
-            <p className="text-center text-gray-500 py-4">
-              {termoBusca ? "Nenhuma casa encontrada com esse termo." : "Nenhuma casa cadastrada neste bairro."}
-            </p>
+              <h2 className="text-lg font-medium text-blue-800">
+                Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
+              </h2>
+
+              {casasFiltradas.length > 0 ? (
+                <ListaCasas 
+                  casas={casasFiltradas}
+                  temHistoricoVisitas={temHistoricoVisitas}
+                  onAbrirFormulario={abrirFormularioCasa}
+                  onAbrirHistorico={abrirHistoricoVisitas}
+                />
+              ) : (
+                <p className="text-center text-gray-500 py-4">
+                  {termoBusca ? "Nenhuma casa encontrada com esse termo." : "Nenhuma casa cadastrada neste bairro."}
+                </p>
+              )}
+            </div>
+          )}
+
+          {!bairroSelecionado && (
+            <div className="text-center text-gray-500 p-8">
+              Selecione um bairro para visualizar as residências disponíveis.
+            </div>
           )}
         </div>
-      )}
-
-      {!bairroSelecionado && (
-        <div className="text-center text-gray-500 p-8">
-          Selecione um bairro para visualizar as residências disponíveis.
-        </div>
-      )}
+      </div>
+      
+      {/* Menu de navegação inferior fixo */}
+      <MobileNavbar currentPath="visitas" />
     </div>
   );
 };

@@ -11,6 +11,8 @@ import DashboardPage from "@/pages/DashboardPage";
 import UsersPage from "@/pages/UsersPage";
 import ProfilePage from "@/pages/ProfilePage";
 import LocalizacaoPage from "@/pages/LocalizacaoPage";
+import AceHistoricoPage from "@/pages/AceHistoricoPage";
+import AcePerfilPage from "@/pages/AcePerfilPage";
 import MapaCalorPage from "@/pages/MapaCalorPage";
 import VisitaPage from "@/pages/VisitaPage";
 import NotFound from "./pages/NotFound";
@@ -66,6 +68,8 @@ const App = () => {
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/localizacao" element={<LocalizacaoPage />} />
+                <Route path="/ace-historico" element={<AceHistoricoPage />} />
+                <Route path="/ace-perfil" element={<AcePerfilPage />} />
                 <Route path="/mapa-calor" element={<MapaCalorPage />} />
                 <Route path="/visita/:casaId" element={<VisitaPage />} />
               </Route>
