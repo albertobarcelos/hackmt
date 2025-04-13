@@ -1,13 +1,69 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { VisitaHistorico } from "@/components/visita/HistoricoVisitas";
+import HistoricoVisitasMobile from "@/components/visita/HistoricoVisitasMobile";
+import { useVisitas } from "@/hooks/useVisitas";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import DetalhesVisita from "@/components/visita/DetalhesVisita";
 
 const HistoricoPage = () => {
+  const { visitas, isLoading, obterDetalhesVisita } = useVisitas();
+  const [visitaDetalhesId, setVisitaDetalhesId] = useState<string | null>(null);
+
+  // Formatar as visitas no formato esperado pelo componente HistoricoVisitas
+  const visitasFormatadas: VisitaHistorico[] = visitas.map(visita => ({
+    id: visita.id,
+    casaId: visita.casaId,
+    endereco: visita.endereco,
+    dataVisita: new Date(visita.dataVisita),
+    tempoVisita: visita.tempoVisita,
+    nome_agente: visita.nome_agente,
+    situacao_imovel: visita.situacao_imovel,
+  }));
+
+  const handleVerDetalhes = (visitaId: string) => {
+    setVisitaDetalhesId(visitaId);
+  };
+  
+  const fecharDetalhes = () => {
+    setVisitaDetalhesId(null);
+  };
+  
+  const detalhesVisita = visitaDetalhesId ? obterDetalhesVisita(visitaDetalhesId) : null;
+
   return (
     <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Histórico de Visitas</h2>
-      <div className="text-gray-500 text-center p-8">
-        Histórico de visitas será exibido aqui
-      </div>
+      <h2 className="text-lg font-semibold mb-4 text-blue-800">Histórico de Visitas</h2>
+      
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <p>Carregando histórico...</p>
+        </div>
+      ) : visitasFormatadas.length > 0 ? (
+        <HistoricoVisitasMobile
+          visitas={visitasFormatadas}
+          onVerDetalhes={handleVerDetalhes}
+        />
+      ) : (
+        <div className="text-gray-500 text-center p-6 bg-white rounded-md shadow-sm">
+          <p>Nenhuma visita registrada.</p>
+          <p className="text-xs mt-2">
+            As visitas realizadas aparecerão aqui automaticamente.
+          </p>
+        </div>
+      )}
+      
+      {/* Modal de detalhes da visita */}
+      <Dialog open={!!visitaDetalhesId} onOpenChange={fecharDetalhes}>
+        <DialogContent className="max-w-[360px] p-0">
+          {detalhesVisita && (
+            <DetalhesVisita 
+              visita={detalhesVisita} 
+              onFechar={fecharDetalhes} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
