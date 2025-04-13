@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -92,6 +91,27 @@
 
   body {
     @apply bg-background text-foreground;
+    overflow: hidden; /* Removes the outer scrollbar */
+  }
+
+  /* Customizar a barra de rolagem interna */
+  * {
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: hsl(var(--primary)/50%) transparent; /* Cor da barra de rolagem */
+  }
+
+  /* Estilização da barra de rolagem para WebKit (Chrome, Safari, newer Edge) */
+  *::-webkit-scrollbar {
+    width: 8px; /* Largura fina da barra de rolagem */
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary)/50%);
+    border-radius: 20px;
   }
 }
 
