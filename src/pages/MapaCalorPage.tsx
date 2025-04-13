@@ -100,9 +100,9 @@ const MapaCalorPage: React.FC = () => {
         // Centro do mapa - corrigido o caractere invisível
         const center = new google.maps.LatLng(-16.0711, -57.6789); // Pantanal por padrão
         
-        // Configurações do mapa
+        // Configurações do mapa com zoom aumentado
         const mapOptions = {
-          zoom: 13,
+          zoom: 15, // Aumentado para um zoom maior
           center,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           styles: [
@@ -132,23 +132,22 @@ const MapaCalorPage: React.FC = () => {
           weight: 10 // Peso alto para destacar áreas não visitadas
         }));
         
-        // Criar o mapa de calor das áreas não visitadas (padrão)
+        // Criar o mapa de calor das áreas não visitadas com cores quentes (vermelho/laranja)
         const newHeatmapNaoVisitadas = new google.maps.visualization.HeatmapLayer({
           data: naoVisitadasData,
           map: newMap,
           radius: 50,
           gradient: [
-            'rgba(0, 255, 255, 0)',
-            'rgba(0, 255, 255, 1)',
-            'rgba(0, 191, 255, 1)',
-            'rgba(0, 127, 255, 1)',
-            'rgba(0, 63, 255, 1)',
-            'rgba(0, 0, 255, 1)',
-            'rgba(0, 0, 223, 1)',
-            'rgba(0, 0, 191, 1)',
-            'rgba(0, 0, 159, 1)',
-            'rgba(0, 0, 127, 1)'
-          ]
+            'rgba(0, 0, 0, 0)',     // transparente no início
+            'rgba(255, 165, 0, 0.6)', // laranja para áreas menos críticas
+            'rgba(255, 140, 0, 0.7)', // laranja escuro
+            'rgba(255, 69, 0, 0.8)',  // vermelho-laranja
+            'rgba(255, 0, 0, 0.9)',   // vermelho
+            'rgba(220, 0, 0, 1)',     // vermelho escuro para áreas mais críticas
+            'rgba(185, 0, 0, 1)',     // vermelho muito escuro
+            'rgba(165, 0, 0, 1)'      // vermelho intenso
+          ],
+          opacity: 0.8
         });
         
         // Adicionar marcadores para as áreas não visitadas
@@ -159,9 +158,9 @@ const MapaCalorPage: React.FC = () => {
             title: `${area.endereco} - Não visitado`,
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
-              fillColor: '#0000FF',
-              fillOpacity: 0.6,
-              strokeColor: '#0000FF',
+              fillColor: '#ea384c', // Vermelho mais intenso para pontos críticos
+              fillOpacity: 0.8,
+              strokeColor: '#ea384c',
               strokeWeight: 1,
               scale: 8
             }
@@ -170,9 +169,9 @@ const MapaCalorPage: React.FC = () => {
           const infoWindow = new google.maps.InfoWindow({
             content: `
               <div style="padding: 10px;">
-                <h3 style="margin: 0 0 5px 0; font-size: 16px;">Área não visitada</h3>
+                <h3 style="margin: 0 0 5px 0; font-size: 16px;">Área crítica</h3>
                 <p style="margin: 0; font-size: 14px;">${area.endereco}</p>
-                <p style="margin: 5px 0 0 0; color: #FF0000; font-size: 14px;">
+                <p style="margin: 5px 0 0 0; color: #ea384c; font-size: 14px; font-weight: bold;">
                   Possível foco de dengue!
                 </p>
               </div>
@@ -207,27 +206,27 @@ const MapaCalorPage: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            Áreas com Baixa Frequência de Visitas
+            Áreas Críticas com Baixa Frequência de Visitas
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-between items-center mb-4">
             <div className="text-sm text-muted-foreground">
               Este mapa mostra as áreas com menor frequência de visitas domiciliares.
-              <span className="text-blue-600 font-semibold"> As áreas em azul indicam locais raramente visitados</span>, 
+              <span className="text-red-600 font-semibold"> As áreas em vermelho indicam locais raramente visitados</span>, 
               que podem ser focos potenciais de dengue por falta de inspeção regular.
             </div>
             
             <button 
               className={`px-4 py-2 rounded-md ${
                 mapMode === "naoVisitadas" 
-                ? "bg-blue-500 text-white" 
+                ? "bg-red-500 text-white" 
                 : "bg-gray-200 text-gray-700"
               }`}
               onClick={alternarModoDeMapa}
             >
               {mapMode === "naoVisitadas" 
-                ? "Mostrando: Áreas não visitadas" 
+                ? "Mostrando: Áreas críticas" 
                 : "Mostrando: Visitas realizadas"}
             </button>
           </div>
@@ -238,16 +237,22 @@ const MapaCalorPage: React.FC = () => {
           />
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
             </div>
           )}
-          <div className="mt-4 flex justify-between items-center text-xs text-muted-foreground">
-            <div>
+          <div className="mt-4 flex justify-between items-center">
+            <div className="text-xs text-muted-foreground">
               Dados atualizados em: {new Date().toLocaleDateString()}
             </div>
-            <div className="flex items-center">
-              <span className="inline-block w-3 h-3 bg-blue-500 rounded-full mr-1"></span>
-              <span>Áreas raramente visitadas</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center">
+                <span className="inline-block w-3 h-3 bg-orange-400 rounded-full mr-1"></span>
+                <span className="text-xs">Menor prioridade</span>
+              </div>
+              <div className="flex items-center">
+                <span className="inline-block w-3 h-3 bg-red-600 rounded-full mr-1"></span>
+                <span className="text-xs">Alta prioridade</span>
+              </div>
             </div>
           </div>
         </CardContent>
