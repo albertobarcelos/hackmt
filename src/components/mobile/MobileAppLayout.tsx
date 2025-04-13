@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Home, Clock, User } from "lucide-react";
+import { Home, Clock, User, Book } from "lucide-react";
 
 const MobileAppLayout = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const MobileAppLayout = () => {
       <nav className="fixed bottom-0 left-0 right-0 max-w-[375px] mx-auto h-16 bg-white border-t border-gray-200 flex items-center justify-around px-2 z-10">
         <button
           onClick={() => navigate("/app-ace")}
-          className={`flex flex-col items-center justify-center w-1/3 h-full ${
+          className={`flex flex-col items-center justify-center w-1/4 h-full ${
             isActive("/app-ace") ? "text-primary" : "text-gray-500"
           }`}
         >
@@ -37,7 +37,7 @@ const MobileAppLayout = () => {
         
         <button
           onClick={() => navigate("/app-ace/historico")}
-          className={`flex flex-col items-center justify-center w-1/3 h-full ${
+          className={`flex flex-col items-center justify-center w-1/4 h-full ${
             isActive("/app-ace/historico") ? "text-primary" : "text-gray-500"
           }`}
         >
@@ -46,8 +46,18 @@ const MobileAppLayout = () => {
         </button>
         
         <button
+          onClick={() => navigate("/app-ace/treinamento")}
+          className={`flex flex-col items-center justify-center w-1/4 h-full ${
+            isActive("/app-ace/treinamento") ? "text-primary" : "text-gray-500"
+          }`}
+        >
+          <Book size={24} />
+          <span className="text-xs mt-1">Treinamento</span>
+        </button>
+        
+        <button
           onClick={() => navigate("/app-ace/perfil")}
-          className={`flex flex-col items-center justify-center w-1/3 h-full ${
+          className={`flex flex-col items-center justify-center w-1/4 h-full ${
             isActive("/app-ace/perfil") ? "text-primary" : "text-gray-500"
           }`}
         >

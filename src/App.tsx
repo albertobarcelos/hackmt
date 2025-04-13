@@ -24,6 +24,7 @@ import MobileAppLayout from "@/components/mobile/MobileAppLayout";
 import VisitasPage from "@/pages/app-ace/VisitasPage";
 import HistoricoPage from "@/pages/app-ace/HistoricoPage";
 import PerfilPage from "@/pages/app-ace/PerfilPage";
+import TreinamentoPage from "@/pages/app-ace/TreinamentoPage";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => {
                 <Route path="/app-ace" element={<VisitasPage />} />
                 <Route path="/app-ace/historico" element={<HistoricoPage />} />
                 <Route path="/app-ace/perfil" element={<PerfilPage />} />
+                <Route path="/app-ace/treinamento" element={<TreinamentoPage />} />
                 {/* Adicionamos uma rota específica para visitas pelo app móvel */}
                 <Route path="/app-ace/visita/:casaId" element={<VisitaPage />} />
               </Route>
