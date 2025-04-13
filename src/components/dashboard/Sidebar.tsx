@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -52,12 +51,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       path: "/localizacao",
       name: "Localização",
       icon: <MapPin size={20} />,
-    },
-    {
-      path: "/localizacao-mapa",
-      name: "Mapa de Visitas",
-      icon: <MapPin size={20} />,
-    },
+    }
   ];
 
   const isActive = (path: string) => {
