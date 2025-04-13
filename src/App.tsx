@@ -11,6 +11,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import UsersPage from "@/pages/UsersPage";
 import ProfilePage from "@/pages/ProfilePage";
 import LocalizacaoPage from "@/pages/LocalizacaoPage";
+import MapaCalorPage from "@/pages/MapaCalorPage";
 import VisitaPage from "@/pages/VisitaPage";
 import NotFound from "./pages/NotFound";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
@@ -65,6 +66,7 @@ const App = () => {
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/localizacao" element={<LocalizacaoPage />} />
+                <Route path="/mapa-calor" element={<MapaCalorPage />} />
                 <Route path="/visita/:casaId" element={<VisitaPage />} />
               </Route>
             </Route>
