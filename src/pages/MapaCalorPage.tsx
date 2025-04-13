@@ -37,8 +37,8 @@ const MapaCalorPage: React.FC = () => {
   // Inicializar o mapa quando o Google Maps estiver carregado
   useEffect(() => {
     if (googleMapsLoaded && mapRef.current) {
-      // Centro do mapa
-      const center = new google.maps.LatLng(-16.0711​, -57.6789); // São Paulo por padrão
+      // Centro do mapa - corrigido o caractere invisível
+      const center = new google.maps.LatLng(-16.0711, -57.6789); // Pantanal por padrão
       
       // Configurações do mapa
       const mapOptions = {
