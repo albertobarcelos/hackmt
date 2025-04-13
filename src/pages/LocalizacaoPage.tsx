@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, Map } from "lucide-react";
+import { Map } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
+import VisualizacaoToggle from "@/components/localizacao/VisualizacaoToggle";
 
 // Dados fictícios de bairros
 const bairros = [
@@ -77,12 +79,16 @@ const LocalizacaoPage: React.FC = () => {
     }
   };
 
-  // Simulação de navegação para o formulário da casa
+  // Navegação para o formulário da casa
   const abrirFormularioCasa = (casaId: string) => {
-    // Aqui você navegaria para o formulário da casa específica
-    console.log(`Abrindo formulário para casa ID: ${casaId}`);
-    // navigate(`/formulario-casa/${casaId}`);
-    alert(`Formulário para casa ID: ${casaId} será implementado em breve!`);
+    const casa = casasFiltradas.find(c => c.id === casaId);
+    if (casa) {
+      const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
+      
+      navigate(`/visita/${casaId}`, { 
+        state: { endereco: enderecoCompleto } 
+      });
+    }
   };
 
   return (
@@ -111,20 +117,11 @@ const LocalizacaoPage: React.FC = () => {
       </Card>
 
       {/* Botão para alternar para visualização de mapa */}
-      <div className="mb-4">
-        <Button 
-          className="w-full flex justify-center items-center gap-2"
-          variant="outline"
-          onClick={() => navigate('/localizacao-mapa')}
-        >
-          <Map size={16} />
-          <span>Ver no mapa</span>
-        </Button>
-      </div>
+      <VisualizacaoToggle />
 
       {/* Lista de Casas (aparece apenas quando um bairro é selecionado) */}
       {bairroSelecionado && (
-        <div className="space-y-4">
+        <div className="space-y-4 mt-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input

@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { bairros, casasPorBairro } from "@/data/bairrosData";
 
 // Components
@@ -14,6 +15,7 @@ import VisualizacaoToggle from "@/components/localizacao/VisualizacaoToggle";
 const GOOGLE_MAPS_API_KEY = "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg";
 
 const LocalizacaoMapaPage: React.FC = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [bairroSelecionado, setBairroSelecionado] = useState<string>("");
   const [casasFiltradas, setCasasFiltradas] = useState<Array<{ 
@@ -73,12 +75,15 @@ const LocalizacaoMapaPage: React.FC = () => {
   };
 
   const abrirFormularioCasa = (casaId: string) => {
-    console.log(`Abrindo formulário para casa ID: ${casaId}`);
-    toast({
-      title: "Casa selecionada",
-      description: `Formulário para casa ID: ${casaId} será aberto`
-    });
-    alert(`Formulário para casa ID: ${casaId} será implementado em breve!`);
+    const casa = casasFiltradas.find(c => c.id === casaId);
+    if (casa) {
+      const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
+      
+      navigate(`/visita/${casaId}`, { 
+        state: { endereco: enderecoCompleto } 
+      });
+    }
+    
     setSelectedMarker(null);
   };
 
