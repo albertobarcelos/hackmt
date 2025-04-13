@@ -72,6 +72,7 @@ const App = () => {
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/mapa-calor" element={<MapaCalorPage />} />
+                {/* A visita a partir do admin vai usar o layout do Dashboard */}
                 <Route path="/visita/:casaId" element={<VisitaPage />} />
               </Route>
 
@@ -80,6 +81,8 @@ const App = () => {
                 <Route path="/app-ace" element={<VisitasPage />} />
                 <Route path="/app-ace/historico" element={<HistoricoPage />} />
                 <Route path="/app-ace/perfil" element={<PerfilPage />} />
+                {/* Adicionamos uma rota específica para visitas pelo app móvel */}
+                <Route path="/app-ace/visita/:casaId" element={<VisitaPage />} />
               </Route>
             </Route>
             

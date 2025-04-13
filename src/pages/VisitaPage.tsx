@@ -8,7 +8,7 @@ import DetalhesVisita from "@/components/visita/DetalhesVisita";
 import { useVisitas } from "@/hooks/useVisitas";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,6 +20,8 @@ const VisitaPage: React.FC = () => {
   const { toast } = useToast();
   const { adicionarVisita, obterVisitasPorCasa, obterDetalhesVisita, isLoading } = useVisitas();
   const isMobile = useIsMobile();
+  
+  // Determinar se estamos no contexto do app ACE ou no portal admin
   const isAppAce = location.pathname.includes('/app-ace') || location.state?.fromAppAce;
   
   const [endereco, setEndereco] = useState<string>("");
@@ -68,13 +70,20 @@ const VisitaPage: React.FC = () => {
         description: "Visita registrada com sucesso!",
         variant: "default"
       });
+      
+      // Correção da navegação após salvar
+      if (isAppAce) {
+        navigate('/app-ace');
+      } else {
+        navigate('/localizacao');
+      }
     }
   };
   
   // Função para voltar à página anterior
   const handleCancelar = () => {
     if (isAppAce) {
-      navigate('/app-ace/visitas');
+      navigate('/app-ace');
     } else {
       navigate('/localizacao');
     }
@@ -181,10 +190,15 @@ const VisitaPage: React.FC = () => {
         )}
       </div>
       
-      {/* Dialog para exibir detalhes da visita */}
+      {/* Dialog para exibir detalhes da visita - corrigindo acessibilidade */}
       <Dialog open={!!detalhesVisita} onOpenChange={fecharDetalhes}>
         <DialogContent className={`${isAppAce ? 'max-w-[360px]' : 'max-w-3xl'} p-0 ${isAppAce ? '' : 'bg-transparent border-none shadow-none'}`}>
-          {detalhesVisita && <DetalhesVisita visita={detalhesVisita} onFechar={fecharDetalhes} />}
+          {detalhesVisita && (
+            <>
+              <DialogTitle className="sr-only">Detalhes da Visita</DialogTitle>
+              <DetalhesVisita visita={detalhesVisita} onFechar={fecharDetalhes} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

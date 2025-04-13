@@ -70,13 +70,13 @@ const VisitasPage = () => {
     }
   };
 
-  // Navegação para o formulário da casa
+  // Navegação para o formulário da casa - agora usando a nova rota específica para o app ACE
   const abrirFormularioCasa = (casaId: string) => {
     const casa = casasFiltradas.find(c => c.id === casaId);
     if (casa) {
       const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
       
-      navigate(`/visita/${casaId}`, { 
+      navigate(`/app-ace/visita/${casaId}`, { 
         state: { 
           endereco: enderecoCompleto,
           fromAppAce: true
@@ -151,4 +151,3 @@ const VisitasPage = () => {
 };
 
 export default VisitasPage;
-
