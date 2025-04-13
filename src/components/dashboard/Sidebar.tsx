@@ -4,14 +4,10 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
-  BookOpen,
-  ListChecks,
-  FileText,
-  Bell
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -53,29 +49,9 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       icon: <Users size={20} />,
     },
     {
-      path: "/tasks",
-      name: "Tasks",
-      icon: <ListChecks size={20} />,
-    },
-    {
-      path: "/reports",
-      name: "Reports",
-      icon: <FileText size={20} />,
-    },
-    {
-      path: "/notifications",
-      name: "Notifications",
-      icon: <Bell size={20} />,
-    },
-    {
-      path: "/documentation",
-      name: "Documentation",
-      icon: <BookOpen size={20} />,
-    },
-    {
-      path: "/settings",
-      name: "Settings",
-      icon: <Settings size={20} />,
+      path: "/localizacao",
+      name: "Localização",
+      icon: <MapPin size={20} />,
     },
   ];
 
