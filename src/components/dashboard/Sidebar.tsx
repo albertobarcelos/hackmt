@@ -8,8 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Home,
-  MapPin,
-  Smartphone
+  MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -52,8 +51,8 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     },
     {
       path: "/localizacao",
-      name: "App do ACE",
-      icon: <Smartphone size={20} />,
+      name: "Visitas Domiciliares",
+      icon: <Home size={20} />,
     },
     {
       path: "/mapa-calor",

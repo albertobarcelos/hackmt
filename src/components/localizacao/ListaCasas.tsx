@@ -25,31 +25,33 @@ const ListaCasas: React.FC<ListaCasasProps> = ({
   onAbrirHistorico
 }) => {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {casas.map((casa) => (
         <Card key={casa.id} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-3">
-            <div>
-              <h3 className="font-medium text-sm truncate">{casa.endereco}, {casa.numero}</h3>
-              {casa.referencia && (
-                <p className="text-xs text-gray-600 mb-2 truncate">Ref: {casa.referencia}</p>
-              )}
-              <div className="flex gap-2 mt-2">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-medium">{casa.endereco}, {casa.numero}</h3>
+                {casa.referencia && (
+                  <p className="text-sm text-gray-600">Ref: {casa.referencia}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
                 {temHistoricoVisitas(casa.id) && (
                   <Button 
-                    className="bg-blue-500 hover:bg-blue-600 h-8 text-xs px-2"
+                    className="bg-blue-500 hover:bg-blue-600"
                     onClick={() => onAbrirHistorico(casa.id)}
                     title="Ver histórico de visitas"
                   >
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    Histórico
+                    <Clock className="h-4 w-4" />
+                    <span className="sr-only md:not-sr-only md:ml-2">Histórico</span>
                   </Button>
                 )}
                 <Button 
-                  className="bg-green-500 hover:bg-green-600 h-8 text-xs px-2"
+                  className="bg-green-500 hover:bg-green-600"
                   onClick={() => onAbrirFormulario(casa.id)}
                 >
-                  <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                  <ArrowRight className="h-4 w-4 mr-1" />
                   Visitar
                 </Button>
               </div>

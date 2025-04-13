@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import FormularioVisita from "@/components/visita/FormularioVisita";
@@ -21,6 +22,7 @@ const VisitaPage: React.FC = () => {
   const [visitaSelecionadaId, setVisitaSelecionadaId] = useState<string | null>(null);
   const [exibirHistorico, setExibirHistorico] = useState<boolean>(false);
   
+  // Verificar se há dados da casa na location
   useEffect(() => {
     if (location.state) {
       if (location.state.endereco) {
@@ -30,16 +32,21 @@ const VisitaPage: React.FC = () => {
         setExibirHistorico(true);
       }
     } else if (casaId) {
+      // Aqui você poderia buscar os dados da casa usando o ID
+      // Por enquanto estamos usando dados fictícios
       setEndereco("Endereço não especificado");
     }
   }, [location.state, casaId]);
   
+  // Obter as visitas para esta casa
   const visitasCasa = casaId ? obterVisitasPorCasa(casaId) : [];
   
+  // Detalhes da visita selecionada (se houver)
   const detalhesVisita = visitaSelecionadaId 
     ? obterDetalhesVisita(visitaSelecionadaId)
     : null;
   
+  // Função para salvar os dados da visita
   const handleSalvarVisita = async (dados: any) => {
     if (!casaId) {
       toast({
@@ -61,34 +68,39 @@ const VisitaPage: React.FC = () => {
     }
   };
   
+  // Função para voltar à página anterior
   const handleCancelar = () => {
     navigate('/localizacao');
   };
   
+  // Exibir detalhes de uma visita
   const handleVerDetalhes = (visitaId: string) => {
     setVisitaSelecionadaId(visitaId);
   };
   
+  // Fechar modal de detalhes
   const fecharDetalhes = () => {
     setVisitaSelecionadaId(null);
   };
   
+  // Exibir o formulário ou o histórico de visitas
   const toggleExibicao = () => {
     setExibirHistorico(!exibirHistorico);
   };
 
+  // Renderizando o esqueleto de carregamento
   if (isLoading) {
     return (
-      <div className="container mx-auto max-w-sm px-3 pt-4 pb-16">
-        <div className="mb-4 flex items-center">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="ml-auto h-8 w-24" />
+      <div className="container mx-auto max-w-4xl px-4 pt-4 pb-16">
+        <div className="mb-6 flex items-center">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="ml-auto h-10 w-32" />
         </div>
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-48" />
-          <div className="space-y-3">
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-64" />
+          <div className="space-y-4">
             {Array(3).fill(0).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full" />
+              <Skeleton key={i} className="h-24 w-full" />
             ))}
           </div>
         </div>
@@ -97,11 +109,11 @@ const VisitaPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-3 pb-16">
-      <div className="container mx-auto max-w-sm px-3">
-        <div className="mb-3 flex items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-4 pb-16">
+      <div className="container mx-auto max-w-4xl px-4">
+        <div className="mb-4 flex items-center">
           <Button 
-            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 p-0"
+            className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
             onClick={handleCancelar}
             variant="link"
           >
@@ -111,7 +123,7 @@ const VisitaPage: React.FC = () => {
           
           {visitasCasa.length > 0 && (
             <Button
-              className="ml-auto text-sm h-8"
+              className="ml-auto"
               variant="outline"
               onClick={toggleExibicao}
             >
@@ -121,8 +133,8 @@ const VisitaPage: React.FC = () => {
         </div>
         
         {exibirHistorico ? (
-          <div className="space-y-4">
-            <h1 className="text-lg font-bold text-blue-900 mb-3">Histórico de Visitas</h1>
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-blue-900 mb-4">Histórico de Visitas</h1>
             <HistoricoVisitas
               visitas={visitasCasa.map(v => ({
                 id: v.id,
@@ -146,8 +158,9 @@ const VisitaPage: React.FC = () => {
         )}
       </div>
       
+      {/* Dialog para exibir detalhes da visita - sem fundo */}
       <Dialog open={!!detalhesVisita} onOpenChange={fecharDetalhes}>
-        <DialogContent className="max-w-sm p-0 bg-transparent border-none shadow-none mx-auto">
+        <DialogContent className="max-w-3xl p-0 bg-transparent border-none shadow-none">
           {detalhesVisita && <DetalhesVisita visita={detalhesVisita} onFechar={fecharDetalhes} />}
         </DialogContent>
       </Dialog>

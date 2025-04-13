@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { Clock, ArrowRight } from "lucide-react";
 import { useVisitas } from "@/hooks/useVisitas";
 import BairroSelector from "@/components/localizacao/BairroSelector";
 import CasaSearch from "@/components/localizacao/CasaSearch";
 import ListaCasas from "@/components/localizacao/ListaCasas";
 import { bairrosData } from "@/data/bairrosData";
-import MobileNavbar from "@/components/mobile/MobileNavbar";
 
 // Dados fictícios de casas por bairro
 const casasPorBairro: Record<string, Array<{ id: string; endereco: string; numero: string; referencia?: string }>> = {
@@ -105,53 +105,46 @@ const LocalizacaoPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen pb-20">
-      <div className="max-w-sm mx-auto px-3 pt-3">
-        <div className="py-2">
-          <h1 className="text-xl font-bold text-blue-900 mb-4 text-center">Visitas</h1>
-          
-          <BairroSelector
-            bairros={bairrosData}
-            bairroSelecionado={bairroSelecionado}
-            onBairroChange={handleBairroChange}
+    <div className="container mx-auto max-w-md p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+      <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Localização de Visitas</h1>
+      
+      <BairroSelector
+        bairros={bairrosData}
+        bairroSelecionado={bairroSelecionado}
+        onBairroChange={handleBairroChange}
+      />
+
+      {bairroSelecionado && (
+        <div className="space-y-4 mt-4">
+          <CasaSearch 
+            termoBusca={termoBusca}
+            onSearchChange={handleBuscaCasa}
           />
 
-          {bairroSelecionado && (
-            <div className="space-y-3 mt-3">
-              <CasaSearch 
-                termoBusca={termoBusca}
-                onSearchChange={handleBuscaCasa}
-              />
+          <h2 className="text-lg font-medium text-blue-800">
+            Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
+          </h2>
 
-              <h2 className="text-sm font-medium text-blue-800">
-                Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
-              </h2>
-
-              {casasFiltradas.length > 0 ? (
-                <ListaCasas 
-                  casas={casasFiltradas}
-                  temHistoricoVisitas={temHistoricoVisitas}
-                  onAbrirFormulario={abrirFormularioCasa}
-                  onAbrirHistorico={abrirHistoricoVisitas}
-                />
-              ) : (
-                <p className="text-center text-gray-500 py-4">
-                  {termoBusca ? "Nenhuma casa encontrada com esse termo." : "Nenhuma casa cadastrada neste bairro."}
-                </p>
-              )}
-            </div>
-          )}
-
-          {!bairroSelecionado && (
-            <div className="text-center text-gray-500 p-6">
-              Selecione um bairro para visualizar as residências disponíveis.
-            </div>
+          {casasFiltradas.length > 0 ? (
+            <ListaCasas 
+              casas={casasFiltradas}
+              temHistoricoVisitas={temHistoricoVisitas}
+              onAbrirFormulario={abrirFormularioCasa}
+              onAbrirHistorico={abrirHistoricoVisitas}
+            />
+          ) : (
+            <p className="text-center text-gray-500 py-4">
+              {termoBusca ? "Nenhuma casa encontrada com esse termo." : "Nenhuma casa cadastrada neste bairro."}
+            </p>
           )}
         </div>
-      </div>
-      
-      {/* Menu de navegação inferior fixo */}
-      <MobileNavbar currentPath="visitas" />
+      )}
+
+      {!bairroSelecionado && (
+        <div className="text-center text-gray-500 p-8">
+          Selecione um bairro para visualizar as residências disponíveis.
+        </div>
+      )}
     </div>
   );
 };
