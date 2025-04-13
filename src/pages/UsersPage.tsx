@@ -1,16 +1,15 @@
-
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/dashboard/DataTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Route } from "lucide-react";
+import { MapPin, Route, Search, Plus, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import HistoricoVisitasAgente from "@/components/agentes/HistoricoVisitasAgente";
 import { TableData } from "@/lib/types";
 
-// Dados mockados para os agentes
 const mockAgentes: TableData[] = [
   {
     id: "1",
@@ -126,7 +125,6 @@ const mockAgentes: TableData[] = [
   },
 ];
 
-// Dados mockados para as visitas dos agentes
 const mockVisitasAgentes = {
   "1": [
     { id: "v1", endereco: "Rua das Flores, 123", data: "2023-05-10", situacao: "Concluída", pendencia: false },
@@ -140,6 +138,18 @@ const mockVisitasAgentes = {
     { id: "v7", endereco: "Rua Quinze, 890", data: "2023-05-16", situacao: "Concluída", pendencia: false },
   ],
 };
+
+const mockRotasAgentes: { [key: string]: string[] } = {
+  "1": ["Rua das Flores", "Av. Brasil", "Rua Treze de Maio"],
+  "2": ["Rua dos Girassóis", "Av. das Nações", "Rua Quinze"],
+};
+
+const ruasDisponiveis = [
+  "Rua das Flores", "Av. Brasil", "Rua Treze de Maio", "Av. Paulista",
+  "Rua dos Girassóis", "Av. das Nações", "Rua Quinze", "Rua Augusta",
+  "Rua Oscar Freire", "Av. Brigadeiro", "Rua Liberdade", "Av. Rebouças",
+  "Rua Consolação", "Av. Santo Amaro", "Rua Joaquim Floriano", "Av. Berrini"
+];
 
 const columns = [
   {
@@ -207,21 +217,42 @@ const columns = [
     key: "actions",
     header: "Ações",
     cell: (agente: any) => (
-      <Button 
-        variant="outline"
-        size="sm"
-        className="flex items-center gap-1"
-        onClick={() => console.log(`Definir rota para ${agente.name}`)}
-      >
-        <Route size={16} />
-        <span>Definir Rota</span>
-      </Button>
+      <div className="flex gap-2 justify-end">
+        <Button 
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1"
+          onClick={(e) => {
+            e.stopPropagation();
+            agente.defineRota();
+          }}
+        >
+          <Route size={16} />
+          <span>Definir Rota</span>
+        </Button>
+        <Button 
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-1"
+          onClick={(e) => {
+            e.stopPropagation();
+            agente.verRotas();
+          }}
+        >
+          <MapPin size={16} />
+          <span>Ver Rotas</span>
+        </Button>
+      </div>
     ),
   },
 ];
 
 const UsersPage: React.FC = () => {
   const [agenteDetalhesId, setAgenteDetalhesId] = useState<string | null>(null);
+  const [definindoRotaParaId, setDefinindoRotaParaId] = useState<string | null>(null);
+  const [buscarRua, setBuscarRua] = useState<string>("");
+  const [rotasSelecionadas, setRotasSelecionadas] = useState<string[]>([]);
+  const [verRotasId, setVerRotasId] = useState<string | null>(null);
   const { toast } = useToast();
   
   const agenteSelecionado = agenteDetalhesId 
@@ -231,6 +262,38 @@ const UsersPage: React.FC = () => {
   const visitasAgente = agenteDetalhesId 
     ? mockVisitasAgentes[agenteDetalhesId] || [] 
     : [];
+
+  const visitasComDetalhes = visitasAgente.map(visita => {
+    return {
+      ...visita,
+      detalhes: {
+        id: visita.id,
+        casaId: `casa-${visita.id}`,
+        endereco: visita.endereco,
+        dataVisita: new Date(visita.data),
+        tempoVisita: 645,
+        nome_agente: agenteSelecionado?.name || "Agente",
+        supervisor: "Carlos Mendes",
+        tipo_imovel: "R",
+        situacao_imovel: visita.situacao === "Concluída" ? "N" : "P",
+        depositos_A1: 1,
+        depositos_A2: 1,
+        depositos_B: 2,
+        depositos_C: 0,
+        depositos_D1: 0,
+        depositos_D2: 0,
+        depositos_E: 0,
+        larvicida_utilizado: "Pyriproxyfen",
+        adulticida_utilizado: "Não utilizado",
+        quantidade_larvicida: 20,
+        depositos_tratados: 2,
+        coleta_amostras: "Sim",
+        amostras_enviadas: 1,
+        pendencia: visita.pendencia ? "Retorno necessário" : undefined,
+        observacoes_gerais: "Visita realizada com sucesso."
+      }
+    };
+  });
 
   const handleAddUser = () => {
     toast({
@@ -246,6 +309,50 @@ const UsersPage: React.FC = () => {
   const closeDetalhes = () => {
     setAgenteDetalhesId(null);
   };
+  
+  const handleDefinirRota = (id: string) => {
+    setDefinindoRotaParaId(id);
+    const rotasExistentes = mockRotasAgentes[id] || [];
+    setRotasSelecionadas([...rotasExistentes]);
+  };
+  
+  const fecharDefinirRota = () => {
+    setDefinindoRotaParaId(null);
+    setBuscarRua("");
+    setRotasSelecionadas([]);
+  };
+  
+  const adicionarRua = (rua: string) => {
+    if (!rotasSelecionadas.includes(rua)) {
+      setRotasSelecionadas([...rotasSelecionadas, rua]);
+    }
+  };
+  
+  const removerRua = (rua: string) => {
+    setRotasSelecionadas(rotasSelecionadas.filter(r => r !== rua));
+  };
+  
+  const salvarRotas = () => {
+    if (definindoRotaParaId) {
+      toast({
+        title: "Rotas definidas",
+        description: `As rotas do agente foram atualizadas com sucesso.`,
+      });
+      fecharDefinirRota();
+    }
+  };
+  
+  const handleVerRotas = (id: string) => {
+    setVerRotasId(id);
+  };
+  
+  const fecharVerRotas = () => {
+    setVerRotasId(null);
+  };
+  
+  const ruasFiltradas = ruasDisponiveis
+    .filter(rua => rua.toLowerCase().includes(buscarRua.toLowerCase()))
+    .filter(rua => !rotasSelecionadas.includes(rua));
 
   return (
     <div className="space-y-6">
@@ -258,13 +365,50 @@ const UsersPage: React.FC = () => {
 
       <DataTable
         title="Gerenciamento de Agentes"
-        data={mockAgentes}
-        columns={columns}
+        data={mockAgentes.map(agente => ({
+          ...agente,
+          defineRota: () => handleDefinirRota(agente.id),
+          verRotas: () => handleVerRotas(agente.id)
+        }))}
+        columns={[
+          ...columns,
+          {
+            key: "actions",
+            header: "Ações",
+            cell: (agente: any) => (
+              <div className="flex gap-2 justify-end">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    agente.defineRota();
+                  }}
+                >
+                  <Route size={16} />
+                  <span>Definir Rota</span>
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    agente.verRotas();
+                  }}
+                >
+                  <MapPin size={16} />
+                  <span>Ver Rotas</span>
+                </Button>
+              </div>
+            ),
+          }
+        ]}
         onAddNew={handleAddUser}
         onRowClick={handleRowClick}
       />
 
-      {/* Modal de detalhes do agente */}
       <Dialog open={!!agenteDetalhesId} onOpenChange={closeDetalhes}>
         <DialogContent className="max-w-4xl bg-transparent border-none shadow-none">
           {agenteSelecionado && (
@@ -328,10 +472,128 @@ const UsersPage: React.FC = () => {
               
               <div>
                 <h3 className="text-lg font-medium mb-4">Histórico de Visitas</h3>
-                <HistoricoVisitasAgente visitas={visitasAgente} />
+                <HistoricoVisitasAgente visitas={visitasComDetalhes} />
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={!!definindoRotaParaId} onOpenChange={fecharDefinirRota}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Definir Rotas do Agente</DialogTitle>
+            <DialogDescription>
+              Selecione as ruas que este agente será responsável por visitar.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Buscar rua..."
+                className="pl-8"
+                value={buscarRua}
+                onChange={(e) => setBuscarRua(e.target.value)}
+              />
+            </div>
+            
+            <div className="border rounded-md p-2 h-40 overflow-auto">
+              {ruasFiltradas.length > 0 ? (
+                <ul className="space-y-1">
+                  {ruasFiltradas.map((rua, index) => (
+                    <li key={index} className="flex justify-between items-center p-1 hover:bg-slate-50 rounded">
+                      <span>{rua}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => adicionarRua(rua)}
+                      >
+                        <Plus size={16} />
+                        <span className="sr-only">Adicionar</span>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center py-2 text-muted-foreground">
+                  {buscarRua ? "Nenhuma rua encontrada" : "Todas as ruas já foram selecionadas"}
+                </p>
+              )}
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-medium mb-2">Ruas selecionadas ({rotasSelecionadas.length})</h4>
+              <div className="border rounded-md p-2">
+                {rotasSelecionadas.length > 0 ? (
+                  <ul className="space-y-1">
+                    {rotasSelecionadas.map((rua, index) => (
+                      <li key={index} className="flex justify-between items-center p-1 hover:bg-slate-50 rounded">
+                        <span>{rua}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => removerRua(rua)}
+                        >
+                          <X size={16} />
+                          <span className="sr-only">Remover</span>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-center py-2 text-muted-foreground">
+                    Nenhuma rua selecionada
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={fecharDefinirRota}>Cancelar</Button>
+            <Button onClick={salvarRotas} disabled={rotasSelecionadas.length === 0}>
+              <Save size={16} className="mr-2" />
+              Salvar Rotas
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={!!verRotasId} onOpenChange={fecharVerRotas}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rotas do Agente</DialogTitle>
+            <DialogDescription>
+              Ruas sob responsabilidade deste agente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {verRotasId && mockRotasAgentes[verRotasId] ? (
+              <div className="border rounded-md p-4">
+                <ul className="space-y-2">
+                  {mockRotasAgentes[verRotasId].map((rua, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <MapPin size={16} className="text-blue-500" />
+                      <span>{rua}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="text-center py-2 text-muted-foreground">
+                Este agente ainda não possui rotas definidas.
+              </p>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button onClick={fecharVerRotas}>Fechar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
