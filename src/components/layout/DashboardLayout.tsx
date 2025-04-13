@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useIsMobile();
+  const location = useLocation();
   
   // For mobile, sidebar is collapsed by default
   useEffect(() => {

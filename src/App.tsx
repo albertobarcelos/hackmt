@@ -10,7 +10,6 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import DashboardPage from "@/pages/DashboardPage";
 import UsersPage from "@/pages/UsersPage";
 import ProfilePage from "@/pages/ProfilePage";
-import LocalizacaoPage from "@/pages/LocalizacaoPage";
 import MapaCalorPage from "@/pages/MapaCalorPage";
 import VisitaPage from "@/pages/VisitaPage";
 import NotFound from "./pages/NotFound";
@@ -19,6 +18,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
+// Importações do aplicativo mobile do ACE
+import MobileAppLayout from "@/components/mobile/MobileAppLayout";
+import VisitasPage from "@/pages/app-ace/VisitasPage";
+import HistoricoPage from "@/pages/app-ace/HistoricoPage";
+import PerfilPage from "@/pages/app-ace/PerfilPage";
 
 const queryClient = new QueryClient();
 
@@ -61,13 +66,20 @@ const App = () => {
             
             {/* Protected routes */}
             <Route element={<ProtectedRoute session={session} />}>
+              {/* Dashboard routes */}
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/localizacao" element={<LocalizacaoPage />} />
                 <Route path="/mapa-calor" element={<MapaCalorPage />} />
                 <Route path="/visita/:casaId" element={<VisitaPage />} />
+              </Route>
+
+              {/* Mobile app routes */}
+              <Route element={<MobileAppLayout />}>
+                <Route path="/app-ace" element={<VisitasPage />} />
+                <Route path="/app-ace/historico" element={<HistoricoPage />} />
+                <Route path="/app-ace/perfil" element={<PerfilPage />} />
               </Route>
             </Route>
             

@@ -50,8 +50,8 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       icon: <Users size={20} />,
     },
     {
-      path: "/localizacao",
-      name: "Visitas Domiciliares",
+      path: "/app-ace",
+      name: "App do ACE",
       icon: <Home size={20} />,
     },
     {
