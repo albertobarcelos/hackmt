@@ -1,21 +1,13 @@
 
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Search, Clock, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 import { useVisitas } from "@/hooks/useVisitas";
-
-// Dados fictícios de bairros
-const bairros = [
-  { id: "1", nome: "Centro" },
-  { id: "2", nome: "Santa Luzia" },
-  { id: "3", nome: "Jardim São Paulo" },
-  { id: "4", nome: "Vila Nova" },
-  { id: "5", nome: "Santo Antônio" },
-];
+import BairroSelector from "@/components/localizacao/BairroSelector";
+import CasaSearch from "@/components/localizacao/CasaSearch";
+import ListaCasas from "@/components/localizacao/ListaCasas";
+import { bairrosData } from "@/data/bairrosData";
 
 // Dados fictícios de casas por bairro
 const casasPorBairro: Record<string, Array<{ id: string; endereco: string; numero: string; referencia?: string }>> = {
@@ -70,12 +62,12 @@ const LocalizacaoPage: React.FC = () => {
     if (termo === "") {
       setCasasFiltradas(casasPorBairro[bairroSelecionado] || []);
     } else {
-      const casasFiltradas = casasPorBairro[bairroSelecionado].filter(casa => 
+      const filtradas = casasPorBairro[bairroSelecionado].filter(casa => 
         casa.endereco.toLowerCase().includes(termo) || 
         casa.numero.toLowerCase().includes(termo) ||
         (casa.referencia && casa.referencia.toLowerCase().includes(termo))
       );
-      setCasasFiltradas(casasFiltradas);
+      setCasasFiltradas(filtradas);
     }
   };
 
@@ -116,81 +108,30 @@ const LocalizacaoPage: React.FC = () => {
     <div className="container mx-auto max-w-md p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Localização de Visitas</h1>
       
-      {/* Seleção de Bairro */}
-      <Card className="mb-6">
-        <CardContent className="pt-4">
-          <div className="space-y-4">
-            <label className="text-sm font-medium text-gray-700">Selecione um Bairro:</label>
-            <Select value={bairroSelecionado} onValueChange={handleBairroChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Escolha um bairro" />
-              </SelectTrigger>
-              <SelectContent>
-                {bairros.map((bairro) => (
-                  <SelectItem key={bairro.id} value={bairro.id}>
-                    {bairro.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <BairroSelector
+        bairros={bairrosData}
+        bairroSelecionado={bairroSelecionado}
+        onBairroChange={handleBairroChange}
+      />
 
-      {/* Lista de Casas (aparece apenas quando um bairro é selecionado) */}
       {bairroSelecionado && (
         <div className="space-y-4 mt-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Buscar por endereço ou referência..."
-              className="pl-8"
-              value={termoBusca}
-              onChange={handleBuscaCasa}
-            />
-          </div>
+          <CasaSearch 
+            termoBusca={termoBusca}
+            onSearchChange={handleBuscaCasa}
+          />
 
           <h2 className="text-lg font-medium text-blue-800">
-            Casas em {bairros.find(b => b.id === bairroSelecionado)?.nome}:
+            Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
           </h2>
 
           {casasFiltradas.length > 0 ? (
-            <div className="space-y-3">
-              {casasFiltradas.map((casa) => (
-                <Card key={casa.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">{casa.endereco}, {casa.numero}</h3>
-                        {casa.referencia && (
-                          <p className="text-sm text-gray-600">Ref: {casa.referencia}</p>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {temHistoricoVisitas(casa.id) && (
-                          <Button 
-                            className="bg-blue-500 hover:bg-blue-600"
-                            onClick={() => abrirHistoricoVisitas(casa.id)}
-                            title="Ver histórico de visitas"
-                          >
-                            <Clock className="h-4 w-4" />
-                            <span className="sr-only md:not-sr-only md:ml-2">Histórico</span>
-                          </Button>
-                        )}
-                        <Button 
-                          className="bg-green-500 hover:bg-green-600"
-                          onClick={() => abrirFormularioCasa(casa.id)}
-                        >
-                          <ArrowRight className="h-4 w-4 mr-1" />
-                          Visitar
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <ListaCasas 
+              casas={casasFiltradas}
+              temHistoricoVisitas={temHistoricoVisitas}
+              onAbrirFormulario={abrirFormularioCasa}
+              onAbrirHistorico={abrirHistoricoVisitas}
+            />
           ) : (
             <p className="text-center text-gray-500 py-4">
               {termoBusca ? "Nenhuma casa encontrada com esse termo." : "Nenhuma casa cadastrada neste bairro."}
