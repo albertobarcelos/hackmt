@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import BairroSelector from "@/components/localizacao/BairroSelector";
@@ -81,16 +82,17 @@ const VisitasPage = () => {
     }
   };
 
-  // Navegação para histórico de visitas
+  // Navegação para histórico de visitas no app mobile
   const abrirHistoricoVisitas = (casaId: string) => {
     const casa = casasFiltradas.find(c => c.id === casaId);
     if (casa) {
       const enderecoCompleto = `${casa.endereco}, ${casa.numero}${casa.referencia ? ` (${casa.referencia})` : ''}`;
       
-      navigate(`/visita/${casaId}`, { 
+      // Redirecionamos para a página de histórico mobile específica da casa
+      navigate(`/app-ace/historico`, { 
         state: { 
-          endereco: enderecoCompleto,
-          exibirHistorico: true 
+          casaId: casaId,
+          endereco: enderecoCompleto
         } 
       });
     }

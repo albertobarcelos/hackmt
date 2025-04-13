@@ -1,17 +1,29 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VisitaHistorico } from "@/components/visita/HistoricoVisitas";
 import HistoricoVisitasMobile from "@/components/visita/HistoricoVisitasMobile";
 import { useVisitas } from "@/hooks/useVisitas";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DetalhesVisita from "@/components/visita/DetalhesVisita";
+import { useLocation } from "react-router-dom";
 
 const HistoricoPage = () => {
-  const { visitas, isLoading, obterDetalhesVisita } = useVisitas();
+  const location = useLocation();
+  const { visitas, isLoading, obterDetalhesVisita, obterVisitasPorCasa } = useVisitas();
   const [visitaDetalhesId, setVisitaDetalhesId] = useState<string | null>(null);
+  
+  // Verificamos se recebemos um casaId específico da navegação
+  const locationState = location.state as { casaId?: string; endereco?: string } | null;
+  const casaId = locationState?.casaId;
+  const enderecoCasa = locationState?.endereco;
+  
+  // Filtramos as visitas por casa se um casaId foi fornecido
+  const visitasExibidas = casaId 
+    ? obterVisitasPorCasa(casaId) || []
+    : visitas;
 
   // Formatar as visitas no formato esperado pelo componente HistoricoVisitas
-  const visitasFormatadas: VisitaHistorico[] = visitas.map(visita => ({
+  const visitasFormatadas: VisitaHistorico[] = visitasExibidas.map(visita => ({
     id: visita.id,
     casaId: visita.casaId,
     endereco: visita.endereco,
@@ -33,7 +45,11 @@ const HistoricoPage = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4 text-blue-800">Histórico de Visitas</h2>
+      <h2 className="text-lg font-semibold mb-4 text-blue-800">
+        {casaId 
+          ? `Histórico: ${enderecoCasa || 'Endereço não disponível'}`
+          : 'Histórico de Visitas'}
+      </h2>
       
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
@@ -48,7 +64,9 @@ const HistoricoPage = () => {
         <div className="text-gray-500 text-center p-6 bg-white rounded-md shadow-sm">
           <p>Nenhuma visita registrada.</p>
           <p className="text-xs mt-2">
-            As visitas realizadas aparecerão aqui automaticamente.
+            {casaId 
+              ? 'Este imóvel ainda não possui visitas registradas.'
+              : 'As visitas realizadas aparecerão aqui automaticamente.'}
           </p>
         </div>
       )}
