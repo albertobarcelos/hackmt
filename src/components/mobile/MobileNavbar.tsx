@@ -14,30 +14,30 @@ const MobileNavbar: React.FC<MobileNavbarProps> = ({ currentPath }) => {
     {
       id: "visitas",
       label: "Visitas",
-      icon: <ClipboardList size={24} />,
+      icon: <ClipboardList size={20} />,
       path: "/localizacao"
     },
     {
       id: "historico",
       label: "Histórico",
-      icon: <History size={24} />,
+      icon: <History size={20} />,
       path: "/ace-historico"
     },
     {
       id: "perfil",
       label: "Perfil",
-      icon: <User size={24} />,
+      icon: <User size={20} />,
       path: "/ace-perfil"
     }
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
-      <div className="flex justify-around items-center h-16 px-4 max-w-md mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="flex justify-around items-center h-14 px-2 max-w-sm mx-auto">
         {navItems.map(item => (
           <button
             key={item.id}
-            className={`flex flex-col items-center justify-center ${
+            className={`flex flex-col items-center justify-center px-2 ${
               currentPath === item.id 
                 ? "text-blue-600" 
                 : "text-gray-500 hover:text-blue-500"
@@ -45,7 +45,7 @@ const MobileNavbar: React.FC<MobileNavbarProps> = ({ currentPath }) => {
             onClick={() => navigate(item.path)}
           >
             {item.icon}
-            <span className="text-xs mt-1">{item.label}</span>
+            <span className="text-[10px] mt-0.5">{item.label}</span>
           </button>
         ))}
       </div>

@@ -105,10 +105,10 @@ const LocalizacaoPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen pb-16">
-      <div className="max-w-md mx-auto p-4">
-        <div className="py-4">
-          <h1 className="text-2xl font-bold text-blue-900 mb-6 text-center">Visitas</h1>
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen pb-20">
+      <div className="max-w-sm mx-auto px-3 pt-3">
+        <div className="py-2">
+          <h1 className="text-xl font-bold text-blue-900 mb-4 text-center">Visitas</h1>
           
           <BairroSelector
             bairros={bairrosData}
@@ -117,13 +117,13 @@ const LocalizacaoPage: React.FC = () => {
           />
 
           {bairroSelecionado && (
-            <div className="space-y-4 mt-4">
+            <div className="space-y-3 mt-3">
               <CasaSearch 
                 termoBusca={termoBusca}
                 onSearchChange={handleBuscaCasa}
               />
 
-              <h2 className="text-lg font-medium text-blue-800">
+              <h2 className="text-sm font-medium text-blue-800">
                 Casas em {bairrosData.find(b => b.id === bairroSelecionado)?.nome}:
               </h2>
 
@@ -143,7 +143,7 @@ const LocalizacaoPage: React.FC = () => {
           )}
 
           {!bairroSelecionado && (
-            <div className="text-center text-gray-500 p-8">
+            <div className="text-center text-gray-500 p-6">
               Selecione um bairro para visualizar as residências disponíveis.
             </div>
           )}
