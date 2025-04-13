@@ -158,9 +158,9 @@ const VisitaPage: React.FC = () => {
         )}
       </div>
       
-      {/* Dialog para exibir detalhes da visita */}
+      {/* Dialog para exibir detalhes da visita - sem fundo */}
       <Dialog open={!!detalhesVisita} onOpenChange={fecharDetalhes}>
-        <DialogContent className="max-w-3xl p-0">
+        <DialogContent className="max-w-3xl p-0 bg-transparent border-none shadow-none">
           {detalhesVisita && <DetalhesVisita visita={detalhesVisita} onFechar={fecharDetalhes} />}
         </DialogContent>
       </Dialog>

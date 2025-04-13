@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Table, 
@@ -23,7 +22,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import DetalhesVisita, { DetalhesVisitaData } from "@/components/visita/DetalhesVisita";
 
 interface VisitasTableProps {
@@ -48,8 +47,6 @@ const VisitasTable: React.FC<VisitasTableProps> = ({ dateRange, bairro }) => {
   const [selectedVisita, setSelectedVisita] = useState<DetalhesVisitaData | null>(null);
   const itemsPerPage = 10;
 
-  // Em uma aplicação real, estes dados viriam da API/banco de dados
-  // e seriam filtrados com base no dateRange e bairro
   const visitas: Visita[] = [
     {
       id: "1",
@@ -465,10 +462,7 @@ const VisitasTable: React.FC<VisitasTableProps> = ({ dateRange, bairro }) => {
       )}
 
       <Dialog open={!!selectedVisita} onOpenChange={() => selectedVisita && fecharDetalhes()}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Detalhes da Visita</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-4xl bg-transparent border-none shadow-none">
           {selectedVisita && (
             <DetalhesVisita 
               visita={selectedVisita} 
