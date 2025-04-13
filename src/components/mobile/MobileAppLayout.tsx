@@ -1,13 +1,18 @@
+
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Home, Clock, User, Book } from "lucide-react";
+
 const MobileAppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
   const isActive = (path: string) => {
     return location.pathname === path;
   };
-  return <div className="flex flex-col h-screen w-full bg-background max-w-[375px] mx-auto shadow-lg overflow-hidden border-x border-gray-200">
+  
+  return (
+    <div className="flex flex-col h-screen w-full bg-background max-w-[375px] mx-auto shadow-lg overflow-hidden border-x border-gray-200">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-4 text-center shadow">
         <h1 className="text-lg font-medium">Visita Agíl</h1>
@@ -40,6 +45,8 @@ const MobileAppLayout = () => {
           <span className="text-xs mt-1">Perfil</span>
         </button>
       </nav>
-    </div>;
+    </div>
+  );
 };
+
 export default MobileAppLayout;
