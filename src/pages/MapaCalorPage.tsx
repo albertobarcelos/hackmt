@@ -38,7 +38,7 @@ const MapaCalorPage: React.FC = () => {
   useEffect(() => {
     if (googleMapsLoaded && mapRef.current) {
       // Centro do mapa
-      const center = new google.maps.LatLng(-23.550520, -46.633308); // São Paulo por padrão
+      const center = new google.maps.LatLng(-16.0711​, -57.6789); // São Paulo por padrão
       
       // Configurações do mapa
       const mapOptions = {
