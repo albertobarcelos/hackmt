@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -25,17 +26,37 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
-  const handleLogout = () => {
-    toast({
-      title: "Logging out",
-      description: "You have been logged out successfully."
-    });
-    // This is where you would connect to Supabase
-    // await supabase.auth.signOut();
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1000);
+  const handleLogout = async () => {
+    try {
+      toast({
+        title: "Encerrando sessão",
+        description: "Você está sendo desconectado..."
+      });
+      
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso."
+      });
+      
+      // Redireciona para a página de login
+      navigate("/login");
+      
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      toast({
+        title: "Erro ao encerrar sessão",
+        description: "Não foi possível desconectar. Por favor, tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   const menuItems = [
