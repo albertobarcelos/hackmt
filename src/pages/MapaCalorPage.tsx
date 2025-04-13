@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useVisitas } from "@/hooks/useVisitas";
+import { bairros } from "@/data/bairrosData";
+import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 
 const MapaCalorPage: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -12,6 +15,7 @@ const MapaCalorPage: React.FC = () => {
   const [heatmap, setHeatmap] = useState<google.maps.visualization.HeatmapLayer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mapMode, setMapMode] = useState<"visitas" | "naoVisitadas">("naoVisitadas");
+  const [bairroSelecionado, setBairroSelecionado] = useState<string | null>(null);
   const { toast } = useToast();
   const { visitas } = useVisitas();
 
@@ -98,12 +102,12 @@ const MapaCalorPage: React.FC = () => {
     if (googleMapsLoaded && mapRef.current) {
       const inicializarMapa = async () => {
         // Centro do mapa - corrigido o caractere invisível
-        const center = new google.maps.LatLng(-16.0711, -57.6789); // Pantanal por padrão
+        const defaultCenter = new google.maps.LatLng(-16.0711, -57.6789); // Pantanal por padrão
         
         // Configurações do mapa com zoom aumentado
         const mapOptions = {
           zoom: 15, // Aumentado para um zoom maior
-          center,
+          center: defaultCenter,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           styles: [
             {
@@ -190,6 +194,7 @@ const MapaCalorPage: React.FC = () => {
     }
   }, [googleMapsLoaded, toast]);
 
+  // Função para alternar o modo de exibição do mapa
   const alternarModoDeMapa = () => {
     setMapMode(prev => prev === "visitas" ? "naoVisitadas" : "visitas");
     
@@ -198,15 +203,99 @@ const MapaCalorPage: React.FC = () => {
       // Por ora, está apenas mudando o estado
     }
   };
+  
+  // Função para focar em um bairro específico
+  const focarNoBairro = (bairroId: string) => {
+    const bairroSelecionado = bairros.find(b => b.id === bairroId);
+    setBairroSelecionado(bairroId);
+    
+    if (map && bairroSelecionado) {
+      // Centraliza o mapa no bairro selecionado
+      map.setCenter(bairroSelecionado.center);
+      map.setZoom(16); // Ajusta o zoom para mostrar o bairro em detalhes
+      
+      // Adiciona um marcador no centro do bairro
+      new google.maps.Marker({
+        position: bairroSelecionado.center,
+        map: map,
+        title: `Bairro: ${bairroSelecionado.nome}`,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#4285F4', // Azul do Google
+          fillOpacity: 0.8,
+          strokeColor: '#FFFFFF',
+          strokeWeight: 2,
+          scale: 10
+        }
+      });
+      
+      // Notificação de bairro selecionado
+      toast({
+        title: `Bairro ${bairroSelecionado.nome}`,
+        description: "Mostrando áreas de risco nesta região",
+      });
+    }
+  };
+  
+  // Função para resetar o mapa para visão geral
+  const resetarMapa = () => {
+    if (map) {
+      map.setCenter(new google.maps.LatLng(-16.0711, -57.6789)); // Voltar ao centro original
+      map.setZoom(15); // Voltar ao zoom original
+      setBairroSelecionado(null);
+    }
+  };
 
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">Mapa de Calor</h1>
       
+      <Card className="mb-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">
+            Selecione um Bairro
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {bairros.map((bairro) => (
+              <Button
+                key={bairro.id}
+                variant={bairroSelecionado === bairro.id ? "default" : "outline"}
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => focarNoBairro(bairro.id)}
+              >
+                <MapPin size={16} />
+                {bairro.nome}
+              </Button>
+            ))}
+            {bairroSelecionado && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetarMapa}
+              >
+                Visão Geral
+              </Button>
+            )}
+          </div>
+          {bairroSelecionado && (
+            <p className="text-sm text-muted-foreground mb-2">
+              Mostrando áreas de {bairros.find(b => b.id === bairroSelecionado)?.nome}. 
+              As áreas destacadas em vermelho indicam locais com baixa frequência de visitas.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+      
       <Card>
         <CardHeader>
           <CardTitle>
-            Áreas Críticas com Baixa Frequência de Visitas
+            {bairroSelecionado 
+              ? `Áreas Críticas em ${bairros.find(b => b.id === bairroSelecionado)?.nome}`
+              : "Áreas Críticas com Baixa Frequência de Visitas"
+            }
           </CardTitle>
         </CardHeader>
         <CardContent>
