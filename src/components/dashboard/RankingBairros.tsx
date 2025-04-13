@@ -1,126 +1,125 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRange } from "react-day-picker";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 interface RankingBairrosProps {
   dateRange: DateRange;
+  onBairroSelect: (bairroNome: string) => void;
+  selectedBairro: string | null;
 }
 
-const RankingBairros: React.FC<RankingBairrosProps> = ({ dateRange }) => {
+const RankingBairros: React.FC<RankingBairrosProps> = ({ 
+  dateRange, 
+  onBairroSelect,
+  selectedBairro 
+}) => {
   // Em uma aplicação real, estes dados viriam da API/banco de dados
-  const data = [
-    {
-      name: "Centro",
-      imoveis: 320,
-      positivos: 18,
-    },
-    {
-      name: "Santa Luzia",
-      imoveis: 280,
-      positivos: 12,
-    },
-    {
-      name: "Jardim São Paulo",
-      imoveis: 245,
-      positivos: 15,
-    },
-    {
-      name: "Vila Nova",
-      imoveis: 210,
-      positivos: 7,
-    },
-    {
-      name: "Santo Antônio",
-      imoveis: 188,
-      positivos: 5,
-    },
-  ];
-
   const bairrosInfo = [
-    { nome: "Centro", status: "alto", indice: 5.6 },
-    { nome: "Jardim São Paulo", status: "alto", indice: 6.1 },
-    { nome: "Santa Luzia", status: "médio", indice: 4.3 },
-    { nome: "Vila Nova", status: "baixo", indice: 3.3 },
-    { nome: "Santo Antônio", status: "baixo", indice: 2.7 },
-  ];
+    { 
+      nome: "Centro", 
+      status: "alto", 
+      indice: 5.6, 
+      totalImoveis: 320,
+      visitados: 287,
+      naoVisitados: 33
+    },
+    { 
+      nome: "Jardim São Paulo", 
+      status: "alto", 
+      indice: 6.1,
+      totalImoveis: 245,
+      visitados: 198,
+      naoVisitados: 47
+    },
+    { 
+      nome: "Santa Luzia", 
+      status: "médio", 
+      indice: 4.3,
+      totalImoveis: 280,
+      visitados: 253,
+      naoVisitados: 27
+    },
+    { 
+      nome: "Vila Nova", 
+      status: "baixo", 
+      indice: 3.3,
+      totalImoveis: 210,
+      visitados: 204,
+      naoVisitados: 6
+    },
+    { 
+      nome: "Santo Antônio", 
+      status: "baixo", 
+      indice: 2.7,
+      totalImoveis: 188,
+      visitados: 186,
+      naoVisitados: 2
+    },
+  ].sort((a, b) => b.indice - a.indice);
+
+  const getBairroStatusClass = (status: string) => {
+    switch (status) {
+      case "alto": return "bg-red-500";
+      case "médio": return "bg-yellow-500";
+      case "baixo": return "bg-green-500";
+      default: return "bg-gray-500";
+    }
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Ranking por Bairro</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              barSize={20}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis yAxisId="left" orientation="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Legend />
-              <Bar
-                yAxisId="left"
-                dataKey="imoveis"
-                name="Imóveis Visitados"
-                fill="#8884d8"
-              />
-              <Bar
-                yAxisId="right"
-                dataKey="positivos"
-                name="Focos Positivos"
-                fill="#ff8042"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+    <div className="divide-y">
+      {bairrosInfo.map((bairro, index) => {
+        const progressPercent = (bairro.visitados / bairro.totalImoveis) * 100;
+        const isSelected = selectedBairro === bairro.nome;
         
-        <div className="mt-4">
-          <h5 className="text-sm font-semibold mb-2">Índice de Infestação por Bairro</h5>
-          <div className="space-y-2">
-            {bairrosInfo.map((bairro, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <div>{bairro.nome}</div>
-                <div className="flex items-center space-x-2">
-                  <div className="text-sm">{bairro.indice}%</div>
-                  <Badge
-                    className={
-                      bairro.status === "alto"
-                        ? "bg-red-500"
-                        : bairro.status === "médio"
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
-                    }
-                  >
+        return (
+          <div 
+            key={index} 
+            className={`p-4 hover:bg-gray-50 cursor-pointer ${isSelected ? 'bg-blue-50' : ''}`}
+            onClick={() => onBairroSelect(bairro.nome)}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-medium text-sm">{bairro.nome}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge className={getBairroStatusClass(bairro.status)}>
                     {bairro.status === "alto"
                       ? "Alto risco"
                       : bairro.status === "médio"
                       ? "Médio risco"
                       : "Baixo risco"}
                   </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {bairro.indice}% infestação
+                  </span>
                 </div>
               </div>
-            ))}
+            </div>
+            
+            <div className="mt-3">
+              <div className="flex justify-between text-xs mb-1">
+                <span>Imóveis visitados: {bairro.visitados}/{bairro.totalImoveis}</span>
+                <span>{Math.round(progressPercent)}%</span>
+              </div>
+              <Progress value={progressPercent} className="h-2" />
+              
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="bg-blue-50 p-1 rounded text-xs text-center">
+                  <span className="block font-medium text-blue-800">{bairro.visitados}</span>
+                  <span className="text-blue-600">Visitados</span>
+                </div>
+                <div className="bg-red-50 p-1 rounded text-xs text-center">
+                  <span className="block font-medium text-red-800">{bairro.naoVisitados}</span>
+                  <span className="text-red-600">Pendentes</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        );
+      })}
+    </div>
   );
 };
 
