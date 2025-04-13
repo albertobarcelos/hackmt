@@ -7,7 +7,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  MapPin
+  Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -50,8 +50,8 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     },
     {
       path: "/localizacao",
-      name: "Localização",
-      icon: <MapPin size={20} />,
+      name: "Visitas Domiciliares",
+      icon: <Home size={20} />,
     }
   ];
 

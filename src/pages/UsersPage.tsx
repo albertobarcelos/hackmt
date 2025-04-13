@@ -370,41 +370,7 @@ const UsersPage: React.FC = () => {
           defineRota: () => handleDefinirRota(agente.id),
           verRotas: () => handleVerRotas(agente.id)
         }))}
-        columns={[
-          ...columns,
-          {
-            key: "actions",
-            header: "Ações",
-            cell: (agente: any) => (
-              <div className="flex gap-2 justify-end">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    agente.defineRota();
-                  }}
-                >
-                  <Route size={16} />
-                  <span>Definir Rota</span>
-                </Button>
-                <Button 
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center gap-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    agente.verRotas();
-                  }}
-                >
-                  <MapPin size={16} />
-                  <span>Ver Rotas</span>
-                </Button>
-              </div>
-            ),
-          }
-        ]}
+        columns={columns}
         onAddNew={handleAddUser}
         onRowClick={handleRowClick}
       />

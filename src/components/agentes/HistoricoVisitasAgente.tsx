@@ -10,10 +10,11 @@ import DetalhesVisita from "@/components/visita/DetalhesVisita";
 interface Visita {
   id: string;
   endereco: string;
+  bairro?: string; // Adicionando campo de bairro
   data: string;
   situacao: string;
   pendencia: boolean;
-  detalhes?: any; // Detalhes completos da visita
+  detalhes?: any;
 }
 
 interface HistoricoVisitasAgenteProps {
@@ -57,7 +58,14 @@ const HistoricoVisitasAgente: React.FC<HistoricoVisitasAgenteProps> = ({ visitas
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-blue-500" />
-                    <span>{visita.endereco}</span>
+                    <span>
+                      {visita.endereco}
+                      {visita.bairro && (
+                        <span className="text-xs text-muted-foreground block">
+                          Bairro: {visita.bairro}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
