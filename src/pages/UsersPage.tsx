@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/dashboard/DataTable";
@@ -6,6 +7,7 @@ import { MapPin, Route, Search, Plus, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import HistoricoVisitasAgente from "@/components/agentes/HistoricoVisitasAgente";
 import RotasAgente, { RotaItem } from "@/components/agentes/RotasAgente";
 import { useRotasAgentes } from "@/hooks/useRotasAgentes";
@@ -415,77 +417,79 @@ const UsersPage: React.FC = () => {
       />
 
       <Dialog open={!!agenteDetalhesId} onOpenChange={closeDetalhes}>
-        <DialogContent className="max-w-4xl bg-transparent border-none shadow-none">
+        <DialogContent className="max-w-4xl h-[85vh] max-h-[85vh] p-0 bg-transparent border-none shadow-none overflow-hidden">
           {agenteSelecionado && (
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="mb-6 flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={agenteSelecionado.avatarUrl} alt={agenteSelecionado.name} />
-                    <AvatarFallback className="text-lg">
-                      {agenteSelecionado.name.split(" ").map((n: string) => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-2xl font-bold">{agenteSelecionado.name}</h2>
-                    <p className="text-muted-foreground">{agenteSelecionado.email}</p>
-                    <p className="text-sm">Matrícula: {agenteSelecionado.matricula}</p>
+            <ScrollArea className="h-full w-full">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <div className="mb-6 flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={agenteSelecionado.avatarUrl} alt={agenteSelecionado.name} />
+                      <AvatarFallback className="text-lg">
+                        {agenteSelecionado.name.split(" ").map((n: string) => n[0]).join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h2 className="text-2xl font-bold">{agenteSelecionado.name}</h2>
+                      <p className="text-muted-foreground">{agenteSelecionado.email}</p>
+                      <p className="text-sm">Matrícula: {agenteSelecionado.matricula}</p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant={agenteSelecionado.status === "Ativo" ? "default" : "destructive"}
+                    className={`
+                      ${agenteSelecionado.status === "Ativo" ? "bg-green-500" : ""}
+                      px-3 py-1 text-base
+                    `}
+                  >
+                    {agenteSelecionado.status}
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Área de Atuação</p>
+                    <p className="font-medium">{agenteSelecionado.area}</p>
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Telefone</p>
+                    <p className="font-medium">{agenteSelecionado.telefone}</p>
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Data de Contratação</p>
+                    <p className="font-medium">{new Date(agenteSelecionado.dataContratacao).toLocaleDateString("pt-BR")}</p>
                   </div>
                 </div>
-                <Badge
-                  variant={agenteSelecionado.status === "Ativo" ? "default" : "destructive"}
-                  className={`
-                    ${agenteSelecionado.status === "Ativo" ? "bg-green-500" : ""}
-                    px-3 py-1 text-base
-                  `}
-                >
-                  {agenteSelecionado.status}
-                </Badge>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-slate-50 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Área de Atuação</p>
-                  <p className="font-medium">{agenteSelecionado.area}</p>
-                </div>
-                <div className="bg-slate-50 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Telefone</p>
-                  <p className="font-medium">{agenteSelecionado.telefone}</p>
-                </div>
-                <div className="bg-slate-50 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Data de Contratação</p>
-                  <p className="font-medium">{new Date(agenteSelecionado.dataContratacao).toLocaleDateString("pt-BR")}</p>
-                </div>
-              </div>
-              
-              <div className="bg-slate-50 p-4 rounded-lg mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Visitas</p>
-                    <p className="text-xl font-bold">{agenteSelecionado.totalVisitas}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Pendências</p>
-                    <p className="text-xl font-bold">{agenteSelecionado.pendencias}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Última Visita</p>
-                    <p className="text-xl font-bold">{new Date(agenteSelecionado.ultimaVisita).toLocaleDateString("pt-BR")}</p>
+                
+                <div className="bg-slate-50 p-4 rounded-lg mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total de Visitas</p>
+                      <p className="text-xl font-bold">{agenteSelecionado.totalVisitas}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Pendências</p>
+                      <p className="text-xl font-bold">{agenteSelecionado.pendencias}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Última Visita</p>
+                      <p className="text-xl font-bold">{new Date(agenteSelecionado.ultimaVisita).toLocaleDateString("pt-BR")}</p>
+                    </div>
                   </div>
                 </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Histórico de Visitas</h3>
+                  <HistoricoVisitasAgente visitas={visitasComDetalhes} />
+                </div>
               </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-4">Histórico de Visitas</h3>
-                <HistoricoVisitasAgente visitas={visitasComDetalhes} />
-              </div>
-            </div>
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>
       
       <Dialog open={!!definindoRotaParaId} onOpenChange={fecharDefinirRota}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle>Definir Rotas do Agente</DialogTitle>
             <DialogDescription>
@@ -493,21 +497,23 @@ const UsersPage: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <RotasAgente 
-            rotasSelecionadas={rotasSelecionadas}
-            onAdicionarRua={adicionarRua}
-            onRemoverRua={removerRua}
-            onSalvarRotas={salvarRotas}
-            ruasDisponiveis={getRuasDisponiveis()}
-            buscarRua={buscarRua}
-            onBuscarRuaChange={setBuscarRua}
-            modo="editar"
-          />
+          <ScrollArea className="h-[60vh]">
+            <RotasAgente 
+              rotasSelecionadas={rotasSelecionadas}
+              onAdicionarRua={adicionarRua}
+              onRemoverRua={removerRua}
+              onSalvarRotas={salvarRotas}
+              ruasDisponiveis={getRuasDisponiveis()}
+              buscarRua={buscarRua}
+              onBuscarRuaChange={setBuscarRua}
+              modo="editar"
+            />
+          </ScrollArea>
         </DialogContent>
       </Dialog>
       
       <Dialog open={!!verRotasId} onOpenChange={fecharVerRotas}>
-        <DialogContent>
+        <DialogContent className="max-h-[85vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle>Rotas do Agente</DialogTitle>
             <DialogDescription>
@@ -515,16 +521,18 @@ const UsersPage: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <RotasAgente 
-            rotasSelecionadas={rotasSelecionadas}
-            onAdicionarRua={() => {}}
-            onRemoverRua={() => {}}
-            onSalvarRotas={() => {}}
-            ruasDisponiveis={[]}
-            buscarRua=""
-            onBuscarRuaChange={() => {}}
-            modo="visualizar"
-          />
+          <ScrollArea className="max-h-[60vh]">
+            <RotasAgente 
+              rotasSelecionadas={rotasSelecionadas}
+              onAdicionarRua={() => {}}
+              onRemoverRua={() => {}}
+              onSalvarRotas={() => {}}
+              ruasDisponiveis={[]}
+              buscarRua=""
+              onBuscarRuaChange={() => {}}
+              modo="visualizar"
+            />
+          </ScrollArea>
           
           <DialogFooter>
             <Button onClick={fecharVerRotas}>Fechar</Button>

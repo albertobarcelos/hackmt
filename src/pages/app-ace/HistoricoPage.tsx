@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { VisitaHistorico } from "@/components/visita/HistoricoVisitas";
 import HistoricoVisitasMobile from "@/components/visita/HistoricoVisitasMobile";
@@ -68,7 +69,7 @@ const HistoricoPage = () => {
       )}
       
       <Dialog open={!!visitaDetalhesId} onOpenChange={fecharDetalhes}>
-        <DialogContent className="max-w-[360px] p-0 max-h-[85vh] overflow-hidden">
+        <DialogContent className="max-w-[360px] p-0 h-[85vh] overflow-hidden">
           {detalhesVisita && (
             <DetalhesVisita 
               visita={detalhesVisita} 

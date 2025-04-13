@@ -193,7 +193,7 @@ const VisitaPage: React.FC = () => {
       {/* Dialog para exibir detalhes da visita - adicionando suporte a scroll */}
       <Dialog open={!!detalhesVisita} onOpenChange={fecharDetalhes}>
         <DialogContent 
-          className={`${isAppAce ? 'max-w-[360px]' : 'max-w-3xl'} p-0 ${isAppAce ? '' : 'bg-transparent border-none shadow-none'} max-h-[85vh] overflow-hidden`}
+          className={`${isAppAce ? 'max-w-[360px]' : 'max-w-3xl'} p-0 ${isAppAce ? '' : 'bg-transparent border-none shadow-none'} h-[85vh] overflow-hidden`}
         >
           {detalhesVisita && (
             <>

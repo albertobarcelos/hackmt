@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -98,8 +99,8 @@ const DetalhesVisita: React.FC<DetalhesVisitaProps> = ({ visita, onFechar }) => 
   const videos = temArquivos ? visita.arquivos?.filter(a => a.tipo === 'video') || [] : [];
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-lg overflow-hidden flex flex-col max-h-full">
-      <CardHeader className="bg-blue-50">
+    <Card className="w-full max-w-4xl mx-auto shadow-lg overflow-hidden flex flex-col h-full max-h-full">
+      <CardHeader className="bg-blue-50 shrink-0">
         <CardTitle className="text-xl text-blue-900">Detalhes da Visita</CardTitle>
         <p className="text-sm text-gray-600 mt-1">{visita.endereco}</p>
       </CardHeader>
@@ -321,7 +322,7 @@ const DetalhesVisita: React.FC<DetalhesVisitaProps> = ({ visita, onFechar }) => 
         </CardContent>
       </ScrollArea>
       
-      <CardFooter className="border-t p-4 flex justify-end">
+      <CardFooter className="border-t p-4 flex justify-end shrink-0">
         <Button 
           onClick={onFechar}
           className="bg-blue-500 hover:bg-blue-600"
