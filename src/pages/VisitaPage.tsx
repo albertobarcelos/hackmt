@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import FormularioVisita from "@/components/visita/FormularioVisita";
 import HistoricoVisitas from "@/components/visita/HistoricoVisitas";
+import HistoricoVisitasMobile from "@/components/visita/HistoricoVisitasMobile";
 import DetalhesVisita from "@/components/visita/DetalhesVisita";
 import { useVisitas } from "@/hooks/useVisitas";
 import { Button } from "@/components/ui/button";
@@ -191,4 +192,3 @@ const VisitaPage: React.FC = () => {
 };
 
 export default VisitaPage;
-
